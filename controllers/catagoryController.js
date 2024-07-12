@@ -10,7 +10,7 @@ const getallcategories = async (req, res) => {
     res.status(201).json(categories);
   } catch (error) {
     console.log(error.message);
-    res.status(500).json("Server Error");
+    res.status(500).json(error.message);
   }
 };
 const addnewcategories = async (req, res) => {
@@ -30,7 +30,7 @@ const addnewcategories = async (req, res) => {
     res.status(201).json(addedCategory);
   } catch (error) {
     console.log(error.message);
-    res.status(500).json("Server Error");
+    res.status(500).json(error.message);
   }
 };
 const updateCategory = async (req, res) => {
@@ -98,7 +98,7 @@ const updateCategory = async (req, res) => {
     res.status(200).json(updatedCategory);
   } catch (error) {
     console.error("Error updating category:", error.message);
-    res.status(500).json({ message: "Server Error" });
+    res.status(500).json({ message: error.message });
   }
 };
 const deleteCategory = async (req, res) => {
@@ -148,12 +148,26 @@ const deleteCategory = async (req, res) => {
       res.status(200).json({ message: 'Category deleted successfully' });
     } catch (error) {
       console.error('Error deleting category:', error.message);
-      res.status(500).json({ message: 'Server Error' });
+      res.status(500).json({ message:error.message });
+    }
+  };
+  const getCategoryById = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const category = await Category.findById(id);
+      if (!category) {
+        return res.status(404).json({ message: 'Category not found' });
+      }
+      res.status(200).json(category);
+    } catch (error) {
+      console.log(error.message);
+      res.status(500).json({ message: error.message });
     }
   };
 module.exports = {
   getallcategories,
   addnewcategories,
   updateCategory,
-  deleteCategory
+  deleteCategory,
+  getCategoryById
 };
