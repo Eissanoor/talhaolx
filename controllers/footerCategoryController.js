@@ -1,4 +1,6 @@
 const FooterCategory = require("../models/footerCategoryModel.js");
+const Category = require("../models/catagoryModel");
+const SubCategory = require("../models/subCatagoryModel.js");
 const path = require("path");
 var dotenv = require("dotenv");
 dotenv.config({ path: "./config.env" });
@@ -6,7 +8,7 @@ const { cloudinary } = require("../config/cloudanary.js");
 
 const getAllFooterCategories = async (req, res) => {
     try {
-      const categories = await FooterCategory.find();
+      const categories = await FooterCategory.find().populate("subCategory");
       res.status(201).json(categories);
     } catch (error) {
       console.log(error.message);
@@ -85,11 +87,36 @@ const getAllFooterCategories = async (req, res) => {
       res.status(500).json({ message: error.message });
     }
   };
+  const megamenu = async (req, res) => {
+    try {
+        // Fetch all categories with status 1
+        const categories = await Category.find({ status: 1 }).lean();
+    
+        // Fetch and populate subCategories with status 1
+        const populatedCategories = await Promise.all(categories.map(async (category) => {
+          const subCategories = await SubCategory.find({ catagory: category._id, status: 1 }).lean();
+          
+          // Fetch and populate footerCategories with status 1
+          const populatedSubCategories = await Promise.all(subCategories.map(async (subCategory) => {
+            const footerCategories = await FooterCategory.find({ subCategory: subCategory._id, status: 1 }).lean();
+            return { ...subCategory, footerCategories };
+          }));
+          
+          return { ...category, subCategories: populatedSubCategories };
+        }));
+    
+        res.status(201).json(populatedCategories);
+      }catch (error) {
+      console.log(error.message);
+      res.status(500).json(error.message);
+    }
+  };
   
   module.exports = {
     getAllFooterCategories,
     addNewFooterCategory,
     updateFooterCategory,
     deleteFooterCategory,
-    getFooterCategoryById
+    getFooterCategoryById,
+    megamenu
   };

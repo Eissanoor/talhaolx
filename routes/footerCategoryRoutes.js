@@ -5,9 +5,11 @@ const multer = require('multer');
 const { storage } = require("../config/cloudanary");
 
 const upload = multer({ storage: storage });
+router.get('/megamenu',FooterCategoryController.megamenu)
 router.get('/', FooterCategoryController.getAllFooterCategories)
 router.post('/', FooterCategoryController.addNewFooterCategory)
 router.put('/:id', FooterCategoryController.updateFooterCategory)
 router.delete('/:id', FooterCategoryController.deleteFooterCategory)
 router.get('/:id', FooterCategoryController.getFooterCategoryById)
+
 module.exports = router;
