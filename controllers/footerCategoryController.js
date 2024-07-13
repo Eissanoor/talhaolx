@@ -111,7 +111,7 @@ const getAllFooterCategories = async (req, res) => {
       res.status(500).json(error.message);
     }
   };
-  
+  //
   module.exports = {
     getAllFooterCategories,
     addNewFooterCategory,
