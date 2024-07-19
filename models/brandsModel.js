@@ -105,7 +105,6 @@ const DeviceTypeSchema = new Schema({
       type: String,
       required: true,
     },
-    image:String,
     status: Number,
   }, {
     timestamps: true,
