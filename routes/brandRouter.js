@@ -4,6 +4,15 @@ const brandController = require('../controllers/brandController');
 const multer = require('multer');
 const { storage } = require("../config/cloudanary");
 const upload = multer({ storage: storage });
+
+//--------------------------Furnished----------------------------------------------------------------
+
+router.get('/furnished', brandController.getAllFurnished)
+router.post('/furnished', brandController.addnewFurnished)
+router.put('/furnished', brandController.updateFurnished)
+router.delete('/furnished/:id', brandController.deleteFurnished)
+router.get('/furnished/:id', brandController.getFurnishedById)
+
 //---------------------------------Make-------------------------------
 router.get('/make', brandController.getAllMake)
 router.post('/make',upload.fields([{ name: 'image', maxCount: 1 }]),  brandController.addnewMake)

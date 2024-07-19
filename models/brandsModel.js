@@ -91,15 +91,36 @@ const DeviceTypeSchema = new Schema({
   }, {
     timestamps: true,
   });
+
+  const FurnishedSchema = new Schema({
+    subCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SubCategory",
+    },
+    footerCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "FooterCategory",
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    image:String,
+    status: Number,
+  }, {
+    timestamps: true,
+  });
 const Brand = mongoose.model("Brand", brandSchema);
 const Condition = mongoose.model("Condition", conditionSchema);
 const DeviceType = mongoose.model("DeviceType", DeviceTypeSchema);
 const Type = mongoose.model("Type", TypeSchema);
 const Make = mongoose.model("Make", MakeSchema);
+const Furnished = mongoose.model("Furnished", FurnishedSchema);
 module.exports = {
   Brand,
   Condition,
   DeviceType,
   Type,
-  Make
+  Make,
+  Furnished
 };

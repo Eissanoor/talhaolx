@@ -1,7 +1,119 @@
-const { Brand, Condition,DeviceType,Type,Make } = require("../models/brandsModel");
+const { Brand, Condition,DeviceType,Type,Make,Furnished } = require("../models/brandsModel");
 var dotenv = require("dotenv");
 dotenv.config({ path: "./config.env" });
 const { cloudinary } = require("../config/cloudanary.js");
+
+
+const getAllFurnished = async (req, res) => {
+  try {
+    const categories = await Furnished.find();
+    res.status(201).json(categories);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json(error.message);
+  }
+};
+const addnewFurnished = async (req, res) => {
+  const { name, subCategory, footerCategory, status } = req.body;
+
+  if (!name) {
+    return res.status(400).json({ error: 'Name is required' });
+  }
+
+  if (!subCategory && !footerCategory) {
+    return res.status(400).json({ error: 'Either subCategory or footerCategory is required' });
+  }
+
+  if (subCategory && footerCategory) {
+    return res.status(400).json({ error: 'Only one of subCategory or footerCategory should be provided' });
+  }
+
+  try {
+    const newBrand = new Furnished({
+      name,
+      subCategory: subCategory || null,
+      footerCategory: footerCategory || null,
+      status: status || null,
+    });
+
+    await newBrand.save();
+    res.status(201).json(newBrand);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const updateFurnished = async (req, res) => {
+  const { id } = req.params;
+  const { name, subCategory, footerCategory, status } = req.body;
+
+  if (!name && !subCategory && !footerCategory && status === undefined) {
+    return res.status(400).json({ error: 'At least one field must be provided to update' });
+  }
+
+  if (subCategory && footerCategory) {
+    return res.status(400).json({ error: 'Only one of subCategory or footerCategory should be provided' });
+  }
+
+  try {
+    const brand = await Furnished.findById(id);
+    if (!brand) {
+      return res.status(404).json({ error: 'Furnished not found' });
+    }
+
+    if (name) {
+      brand.name = name;
+    }
+
+    if (subCategory) {
+      brand.subCategory = subCategory;
+      brand.footerCategory = null;  // Clear footerCategory if subCategory is provided
+    }
+
+    if (footerCategory) {
+      brand.footerCategory = footerCategory;
+      brand.subCategory = null;  // Clear subCategory if footerCategory is provided
+    }
+
+    if (status !== undefined) {
+      brand.status = status;
+    }
+
+    await brand.save();
+    res.status(200).json(brand);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const deleteFurnished = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const brand = await Furnished.findByIdAndDelete(id);
+    if (!brand) {
+      return res.status(404).json({ error: 'Furnished not found' });
+    }
+
+    res.status(200).json({ message: 'Furnished deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const getFurnishedById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const brand = await Furnished.findById(id).populate('subCategory footerCategory');
+    if (!brand) {
+      return res.status(404).json({ error: 'Furnished not found' });
+    }
+
+    res.status(200).json(brand);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+//-----------------------------Furnished------------------------------------------------
 const getAllMake = async (req, res) => {
     try {
       const categories = await Make.find();
@@ -622,4 +734,9 @@ const getAllbrand = async (req, res) => {
     updateMake,
     deleteMake,
     getMakeById,
+    getAllFurnished,
+    addnewFurnished,
+    updateFurnished,
+    deleteFurnished,
+    getFurnishedById
   };
