@@ -91,8 +91,137 @@ const DeviceTypeSchema = new Schema({
   }, {
     timestamps: true,
   });
-
+//------------------------------------Furnished--------------------------------
   const FurnishedSchema = new Schema({
+    subCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SubCategory",
+    },
+    footerCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "FooterCategory",
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    status: Number,
+  }, {
+    timestamps: true,
+  });
+
+  //----------------------------------bedrooms--------------------------------
+  const BedroomSchema = new Schema({
+    subCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SubCategory",
+    },
+    footerCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "FooterCategory",
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    status: Number,
+  }, {
+    timestamps: true,
+  });
+
+  //---------------------------------bathroom-----------------------------------
+  const bathroomSchema = new Schema({
+    subCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SubCategory",
+    },
+    footerCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "FooterCategory",
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    status: Number,
+  }, {
+    timestamps: true,
+  });
+  //---------------------------------storeys-----------------------------------
+  const storeySchema = new Schema({
+    subCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SubCategory",
+    },
+    footerCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "FooterCategory",
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    status: Number,
+  }, {
+    timestamps: true,
+  });
+
+  //----------------------------Construction------------------------------------
+  const ConstructionSchema = new Schema({
+    subCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SubCategory",
+    },
+    footerCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "FooterCategory",
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    status: Number,
+  }, {
+    timestamps: true,
+  });
+  //----------------------------Feature------------------------------------
+  const FeatureSchema = new Schema({
+    subCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SubCategory",
+    },
+    footerCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "FooterCategory",
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    status: Number,
+  }, {
+    timestamps: true,
+  });
+  //----------------------------Areaunit------------------------------------
+  const AreaunitSchema = new Schema({
+    subCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SubCategory",
+    },
+    footerCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "FooterCategory",
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    status: Number,
+  }, {
+    timestamps: true,
+  });
+  //----------------------------FloorLevel------------------------------------
+  const FloorLevelSchema = new Schema({
     subCategory: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "SubCategory",
@@ -115,11 +244,25 @@ const DeviceType = mongoose.model("DeviceType", DeviceTypeSchema);
 const Type = mongoose.model("Type", TypeSchema);
 const Make = mongoose.model("Make", MakeSchema);
 const Furnished = mongoose.model("Furnished", FurnishedSchema);
+const Bedroom = mongoose.model("Bedroom", BedroomSchema);
+const bathroom = mongoose.model("Bathroom", bathroomSchema);
+const storey = mongoose.model("Storey", storeySchema);
+const Construction = mongoose.model("Construction", ConstructionSchema);
+const Feature = mongoose.model("Feature", FeatureSchema);
+const Areaunit = mongoose.model("Areaunit", AreaunitSchema);
+const FloorLevel = mongoose.model("FloorLevel", FloorLevelSchema);
 module.exports = {
   Brand,
   Condition,
   DeviceType,
   Type,
   Make,
-  Furnished
+  Furnished,
+  Bedroom,
+  bathroom,
+  storey,
+  Construction,
+  Feature,
+  Areaunit,
+  FloorLevel
 };

@@ -1,8 +1,678 @@
-const { Brand, Condition,DeviceType,Type,Make,Furnished } = require("../models/brandsModel");
+const { Brand, Condition,DeviceType,Type,Make,Furnished,Bedroom,bathroom,storey,Construction,Feature,Areaunit } = require("../models/brandsModel");
 var dotenv = require("dotenv");
 dotenv.config({ path: "./config.env" });
 const { cloudinary } = require("../config/cloudanary.js");
 
+
+
+const getAllAreaunit = async (req, res) => {
+  try {
+    const categories = await Areaunit.find();
+    res.status(201).json(categories);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json(error.message);
+  }
+};
+const addnewAreaunit = async (req, res) => {
+  const { name, subCategory, footerCategory, status } = req.body;
+
+  if (!name) {
+    return res.status(400).json({ error: 'Name is required' });
+  }
+
+  if (!subCategory && !footerCategory) {
+    return res.status(400).json({ error: 'Either subCategory or footerCategory is required' });
+  }
+
+  if (subCategory && footerCategory) {
+    return res.status(400).json({ error: 'Only one of subCategory or footerCategory should be provided' });
+  }
+
+  try {
+    const newBrand = new Areaunit({
+      name,
+      subCategory: subCategory || null,
+      footerCategory: footerCategory || null,
+      status: status || null,
+    });
+
+    await newBrand.save();
+    res.status(201).json(newBrand);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const updateAreaunit = async (req, res) => {
+  const { id } = req.params;
+  const { name, subCategory, footerCategory, status } = req.body;
+
+  if (!name && !subCategory && !footerCategory && status === undefined) {
+    return res.status(400).json({ error: 'At least one field must be provided to update' });
+  }
+
+  if (subCategory && footerCategory) {
+    return res.status(400).json({ error: 'Only one of subCategory or footerCategory should be provided' });
+  }
+
+  try {
+    const brand = await Areaunit.findById(id);
+    if (!brand) {
+      return res.status(404).json({ error: 'Areaunit not found' });
+    }
+
+    if (name) {
+      brand.name = name;
+    }
+
+    if (subCategory) {
+      brand.subCategory = subCategory;
+      brand.footerCategory = null;  // Clear footerCategory if subCategory is provided
+    }
+
+    if (footerCategory) {
+      brand.footerCategory = footerCategory;
+      brand.subCategory = null;  // Clear subCategory if footerCategory is provided
+    }
+
+    if (status !== undefined) {
+      brand.status = status;
+    }
+
+    await brand.save();
+    res.status(200).json(brand);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const deleteAreaunit = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const brand = await Areaunit.findByIdAndDelete(id);
+    if (!brand) {
+      return res.status(404).json({ error: 'Areaunit not found' });
+    }
+
+    res.status(200).json({ message: 'Areaunit deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const getAreaunitById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const brand = await Areaunit.findById(id).populate('subCategory footerCategory');
+    if (!brand) {
+      return res.status(404).json({ error: 'Areaunit not found' });
+    }
+
+    res.status(200).json(brand);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+//--------------------------------------------Areaunit--------------------------------------------
+
+
+const getAllFeature = async (req, res) => {
+  try {
+    const categories = await Feature.find();
+    res.status(201).json(categories);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json(error.message);
+  }
+};
+const addnewFeature = async (req, res) => {
+  const { name, subCategory, footerCategory, status } = req.body;
+
+  if (!name) {
+    return res.status(400).json({ error: 'Name is required' });
+  }
+
+  if (!subCategory && !footerCategory) {
+    return res.status(400).json({ error: 'Either subCategory or footerCategory is required' });
+  }
+
+  if (subCategory && footerCategory) {
+    return res.status(400).json({ error: 'Only one of subCategory or footerCategory should be provided' });
+  }
+
+  try {
+    const newBrand = new Feature({
+      name,
+      subCategory: subCategory || null,
+      footerCategory: footerCategory || null,
+      status: status || null,
+    });
+
+    await newBrand.save();
+    res.status(201).json(newBrand);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const updateFeature = async (req, res) => {
+  const { id } = req.params;
+  const { name, subCategory, footerCategory, status } = req.body;
+
+  if (!name && !subCategory && !footerCategory && status === undefined) {
+    return res.status(400).json({ error: 'At least one field must be provided to update' });
+  }
+
+  if (subCategory && footerCategory) {
+    return res.status(400).json({ error: 'Only one of subCategory or footerCategory should be provided' });
+  }
+
+  try {
+    const brand = await Feature.findById(id);
+    if (!brand) {
+      return res.status(404).json({ error: 'Feature not found' });
+    }
+
+    if (name) {
+      brand.name = name;
+    }
+
+    if (subCategory) {
+      brand.subCategory = subCategory;
+      brand.footerCategory = null;  // Clear footerCategory if subCategory is provided
+    }
+
+    if (footerCategory) {
+      brand.footerCategory = footerCategory;
+      brand.subCategory = null;  // Clear subCategory if footerCategory is provided
+    }
+
+    if (status !== undefined) {
+      brand.status = status;
+    }
+
+    await brand.save();
+    res.status(200).json(brand);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const deleteFeature = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const brand = await Feature.findByIdAndDelete(id);
+    if (!brand) {
+      return res.status(404).json({ error: 'Feature not found' });
+    }
+
+    res.status(200).json({ message: 'Feature deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const getFeatureById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const brand = await Feature.findById(id).populate('subCategory footerCategory');
+    if (!brand) {
+      return res.status(404).json({ error: 'Feature not found' });
+    }
+
+    res.status(200).json(brand);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+//------------------------------Feature------------------------------------------------
+
+
+
+const getAllConstruction = async (req, res) => {
+  try {
+    const categories = await Construction.find();
+    res.status(201).json(categories);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json(error.message);
+  }
+};
+const addnewConstruction = async (req, res) => {
+  const { name, subCategory, footerCategory, status } = req.body;
+
+  if (!name) {
+    return res.status(400).json({ error: 'Name is required' });
+  }
+
+  if (!subCategory && !footerCategory) {
+    return res.status(400).json({ error: 'Either subCategory or footerCategory is required' });
+  }
+
+  if (subCategory && footerCategory) {
+    return res.status(400).json({ error: 'Only one of subCategory or footerCategory should be provided' });
+  }
+
+  try {
+    const newBrand = new Construction({
+      name,
+      subCategory: subCategory || null,
+      footerCategory: footerCategory || null,
+      status: status || null,
+    });
+
+    await newBrand.save();
+    res.status(201).json(newBrand);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const updateConstruction = async (req, res) => {
+  const { id } = req.params;
+  const { name, subCategory, footerCategory, status } = req.body;
+
+  if (!name && !subCategory && !footerCategory && status === undefined) {
+    return res.status(400).json({ error: 'At least one field must be provided to update' });
+  }
+
+  if (subCategory && footerCategory) {
+    return res.status(400).json({ error: 'Only one of subCategory or footerCategory should be provided' });
+  }
+
+  try {
+    const brand = await Construction.findById(id);
+    if (!brand) {
+      return res.status(404).json({ error: 'Construction not found' });
+    }
+
+    if (name) {
+      brand.name = name;
+    }
+
+    if (subCategory) {
+      brand.subCategory = subCategory;
+      brand.footerCategory = null;  // Clear footerCategory if subCategory is provided
+    }
+
+    if (footerCategory) {
+      brand.footerCategory = footerCategory;
+      brand.subCategory = null;  // Clear subCategory if footerCategory is provided
+    }
+
+    if (status !== undefined) {
+      brand.status = status;
+    }
+
+    await brand.save();
+    res.status(200).json(brand);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const deleteConstruction = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const brand = await Construction.findByIdAndDelete(id);
+    if (!brand) {
+      return res.status(404).json({ error: 'Construction not found' });
+    }
+
+    res.status(200).json({ message: 'Construction deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const getConstructionById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const brand = await Construction.findById(id).populate('subCategory footerCategory');
+    if (!brand) {
+      return res.status(404).json({ error: 'Construction not found' });
+    }
+
+    res.status(200).json(brand);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+//------------------------------Construction----------------------------------------------------
+const getAllstorey = async (req, res) => {
+  try {
+    const categories = await storey.find();
+    res.status(201).json(categories);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json(error.message);
+  }
+};
+const addnewstorey = async (req, res) => {
+  const { name, subCategory, footerCategory, status } = req.body;
+
+  if (!name) {
+    return res.status(400).json({ error: 'Name is required' });
+  }
+
+  if (!subCategory && !footerCategory) {
+    return res.status(400).json({ error: 'Either subCategory or footerCategory is required' });
+  }
+
+  if (subCategory && footerCategory) {
+    return res.status(400).json({ error: 'Only one of subCategory or footerCategory should be provided' });
+  }
+
+  try {
+    const newBrand = new storey({
+      name,
+      subCategory: subCategory || null,
+      footerCategory: footerCategory || null,
+      status: status || null,
+    });
+
+    await newBrand.save();
+    res.status(201).json(newBrand);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const updatestorey = async (req, res) => {
+  const { id } = req.params;
+  const { name, subCategory, footerCategory, status } = req.body;
+
+  if (!name && !subCategory && !footerCategory && status === undefined) {
+    return res.status(400).json({ error: 'At least one field must be provided to update' });
+  }
+
+  if (subCategory && footerCategory) {
+    return res.status(400).json({ error: 'Only one of subCategory or footerCategory should be provided' });
+  }
+
+  try {
+    const brand = await storey.findById(id);
+    if (!brand) {
+      return res.status(404).json({ error: 'storey not found' });
+    }
+
+    if (name) {
+      brand.name = name;
+    }
+
+    if (subCategory) {
+      brand.subCategory = subCategory;
+      brand.footerCategory = null;  // Clear footerCategory if subCategory is provided
+    }
+
+    if (footerCategory) {
+      brand.footerCategory = footerCategory;
+      brand.subCategory = null;  // Clear subCategory if footerCategory is provided
+    }
+
+    if (status !== undefined) {
+      brand.status = status;
+    }
+
+    await brand.save();
+    res.status(200).json(brand);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const deletestorey = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const brand = await storey.findByIdAndDelete(id);
+    if (!brand) {
+      return res.status(404).json({ error: 'storey not found' });
+    }
+
+    res.status(200).json({ message: 'storey deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const getstoreyById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const brand = await storey.findById(id).populate('subCategory footerCategory');
+    if (!brand) {
+      return res.status(404).json({ error: 'storey not found' });
+    }
+
+    res.status(200).json(brand);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+//-----------------------------storey-------------------------------
+
+const getAllbathroom = async (req, res) => {
+  try {
+    const categories = await bathroom.find();
+    res.status(201).json(categories);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json(error.message);
+  }
+};
+const addnewbathroom = async (req, res) => {
+  const { name, subCategory, footerCategory, status } = req.body;
+
+  if (!name) {
+    return res.status(400).json({ error: 'Name is required' });
+  }
+
+  if (!subCategory && !footerCategory) {
+    return res.status(400).json({ error: 'Either subCategory or footerCategory is required' });
+  }
+
+  if (subCategory && footerCategory) {
+    return res.status(400).json({ error: 'Only one of subCategory or footerCategory should be provided' });
+  }
+
+  try {
+    const newBrand = new bathroom({
+      name,
+      subCategory: subCategory || null,
+      footerCategory: footerCategory || null,
+      status: status || null,
+    });
+
+    await newBrand.save();
+    res.status(201).json(newBrand);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const updatebathroom = async (req, res) => {
+  const { id } = req.params;
+  const { name, subCategory, footerCategory, status } = req.body;
+
+  if (!name && !subCategory && !footerCategory && status === undefined) {
+    return res.status(400).json({ error: 'At least one field must be provided to update' });
+  }
+
+  if (subCategory && footerCategory) {
+    return res.status(400).json({ error: 'Only one of subCategory or footerCategory should be provided' });
+  }
+
+  try {
+    const brand = await bathroom.findById(id);
+    if (!brand) {
+      return res.status(404).json({ error: 'bathroom not found' });
+    }
+
+    if (name) {
+      brand.name = name;
+    }
+
+    if (subCategory) {
+      brand.subCategory = subCategory;
+      brand.footerCategory = null;  // Clear footerCategory if subCategory is provided
+    }
+
+    if (footerCategory) {
+      brand.footerCategory = footerCategory;
+      brand.subCategory = null;  // Clear subCategory if footerCategory is provided
+    }
+
+    if (status !== undefined) {
+      brand.status = status;
+    }
+
+    await brand.save();
+    res.status(200).json(brand);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const deletebathroom = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const brand = await bathroom.findByIdAndDelete(id);
+    if (!brand) {
+      return res.status(404).json({ error: 'bathroom not found' });
+    }
+
+    res.status(200).json({ message: 'bathroom deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const getbathroomById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const brand = await bathroom.findById(id).populate('subCategory footerCategory');
+    if (!brand) {
+      return res.status(404).json({ error: 'bathroom not found' });
+    }
+
+    res.status(200).json(brand);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+
+
+
+//---------------------------------Bathroom--------------------------------
+const getAllBedroom = async (req, res) => {
+  try {
+    const categories = await Bedroom.find();
+    res.status(201).json(categories);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json(error.message);
+  }
+};
+const addnewBedroom = async (req, res) => {
+  const { name, subCategory, footerCategory, status } = req.body;
+
+  if (!name) {
+    return res.status(400).json({ error: 'Name is required' });
+  }
+
+  if (!subCategory && !footerCategory) {
+    return res.status(400).json({ error: 'Either subCategory or footerCategory is required' });
+  }
+
+  if (subCategory && footerCategory) {
+    return res.status(400).json({ error: 'Only one of subCategory or footerCategory should be provided' });
+  }
+
+  try {
+    const newBrand = new Bedroom({
+      name,
+      subCategory: subCategory || null,
+      footerCategory: footerCategory || null,
+      status: status || null,
+    });
+
+    await newBrand.save();
+    res.status(201).json(newBrand);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const updateBedroom = async (req, res) => {
+  const { id } = req.params;
+  const { name, subCategory, footerCategory, status } = req.body;
+
+  if (!name && !subCategory && !footerCategory && status === undefined) {
+    return res.status(400).json({ error: 'At least one field must be provided to update' });
+  }
+
+  if (subCategory && footerCategory) {
+    return res.status(400).json({ error: 'Only one of subCategory or footerCategory should be provided' });
+  }
+
+  try {
+    const brand = await Bedroom.findById(id);
+    if (!brand) {
+      return res.status(404).json({ error: 'Bedroom not found' });
+    }
+
+    if (name) {
+      brand.name = name;
+    }
+
+    if (subCategory) {
+      brand.subCategory = subCategory;
+      brand.footerCategory = null;  // Clear footerCategory if subCategory is provided
+    }
+
+    if (footerCategory) {
+      brand.footerCategory = footerCategory;
+      brand.subCategory = null;  // Clear subCategory if footerCategory is provided
+    }
+
+    if (status !== undefined) {
+      brand.status = status;
+    }
+
+    await brand.save();
+    res.status(200).json(brand);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const deleteBedroom = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const brand = await Bedroom.findByIdAndDelete(id);
+    if (!brand) {
+      return res.status(404).json({ error: 'Bedroom not found' });
+    }
+
+    res.status(200).json({ message: 'Bedroom deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const getBedroomById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const brand = await Bedroom.findById(id).populate('subCategory footerCategory');
+    if (!brand) {
+      return res.status(404).json({ error: 'Bedroom not found' });
+    }
+
+    res.status(200).json(brand);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+//----------------------------BedRooms----------------------------
 
 const getAllFurnished = async (req, res) => {
   try {
@@ -738,5 +1408,35 @@ const getAllbrand = async (req, res) => {
     addnewFurnished,
     updateFurnished,
     deleteFurnished,
-    getFurnishedById
+    getFurnishedById,
+    getAllBedroom,
+    addnewBedroom,
+    updateBedroom,
+    deleteBedroom,
+    getBedroomById,
+    getAllbathroom,
+    addnewbathroom,
+    updatebathroom,
+    deletebathroom,
+    getbathroomById,
+    getAllstorey,
+    addnewstorey,
+    updatestorey,
+    deletestorey,
+    getstoreyById,
+    getAllConstruction,
+    addnewConstruction,
+    updateConstruction,
+    deleteConstruction,
+    getConstructionById,
+    getAllFeature,
+    addnewFeature,
+    updateFeature,
+    deleteFeature,
+    getFeatureById,
+    getAllAreaunit,
+    addnewAreaunit,
+    updateAreaunit,
+    deleteAreaunit,
+    getAreaunitById
   };

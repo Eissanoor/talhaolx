@@ -4,6 +4,46 @@ const brandController = require('../controllers/brandController');
 const multer = require('multer');
 const { storage } = require("../config/cloudanary");
 const upload = multer({ storage: storage });
+//----------------------Areaunit----------------------------------------------------
+
+router.get('/areaunit', brandController.getAllAreaunit)
+router.post('/areaunit', brandController.addnewAreaunit)
+router.put('/areaunit/:id', brandController.updateAreaunit)
+router.delete('/areaunit/:id', brandController.deleteAreaunit)
+router.get('/areaunit/:id', brandController.getAreaunitById)
+//-------------------------Feature--------------------------------
+router.get('/feature', brandController.getAllFeature)
+router.post('/feature', brandController.addnewFeature)
+router.put('/feature/:id', brandController.updateFeature)
+router.delete('/feature/:id', brandController.deleteFeature)
+router.get('/feature/:id', brandController.getFeatureById)
+//-------------------------Construction----------------------------------------------------
+router.get('/construction', brandController.getAllConstruction)
+router.post('/construction', brandController.addnewConstruction)
+router.put('/construction/:id', brandController.updateConstruction)
+router.delete('/construction/:id', brandController.deleteConstruction)
+router.get('/construction/:id', brandController.getConstructionById)
+//-----------------------storey----------------------------------------------------
+router.get('/storey', brandController.getAllstorey)
+router.post('/storey', brandController.addnewstorey)
+router.put('/storey/:id', brandController.updatestorey)
+router.delete('/storey/:id', brandController.deletestorey)
+router.get('/storey/:id', brandController.getstoreyById)
+
+
+//------------------------bathroom --------------------
+router.get('/bathroom', brandController.getAllbathroom)
+router.post('/bathroom', brandController.addnewbathroom)
+router.put('/bathroom/:id', brandController.updatebathroom)
+router.delete('/bathroom/:id', brandController.deletebathroom)
+router.get('/bathroom/:id', brandController.getbathroomById)
+//---------------------------bedrooms------------------------
+router.get('/bedroom', brandController.getAllBedroom)
+router.post('/bedroom', brandController.addnewBedroom)
+router.get("/bedroom/:id", brandController.getBedroomById)
+router.put('/bedroom/:id', brandController.updateBedroom)
+router.delete("/bedroom/:id", brandController.deleteBedroom)
+
 
 //--------------------------Furnished----------------------------------------------------------------
 
