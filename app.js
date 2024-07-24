@@ -4,11 +4,17 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const dotenv = require('dotenv');
+const passport = require('passport');
+const session = require('express-session');
 const userRoutes = require('./routes/userRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const subCategoryController = require('./routes/subCategoryRoutes')
 const footerCategoryRouter = require('./routes/footerCategoryRoutes')
 const brandRouter = require('./routes/brandRouter')
+
+dotenv.config({ path: "./config.env" });
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET
+
 require("./database/database")
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
@@ -17,6 +23,17 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors()); // Enable CORS
 app.use(helmet()); // Set security-related HTTP headers
 app.use(morgan('dev')); // HTTP request logger
+
+app.use(session({
+  secret: "helloworld",
+  resave: false,
+  saveUninitialized: true
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+
 app.use('/users', userRoutes);
 app.use('/category', categoryRoutes);
 app.use('/subCategory', subCategoryController);
