@@ -2,13 +2,14 @@ var dotenv = require("dotenv");
 const passport = require('passport');
 const session = require('express-session');
 const User = require('../models/userModel');
+const jwt = require('jsonwebtoken');
 dotenv.config({ path: "./config.env" });
 const { cloudinary } = require("../config/cloudanary.js");
 const C_cloud_name = process.env.C_cloud_name
 require('../auth/auth.js');
 // Function to get all users
 const addUser = async (req, res) => {
-  const { username, email, password, dateOfBirth, aboutMe, status, phone, address } = req.body;
+  const { username, email, password, dateOfBirth, aboutMe, phone, address } = req.body;
   const image = req.files && req.files["image"] ? req.files["image"][0].path : null;
 
   if (!username) {
@@ -19,8 +20,11 @@ const addUser = async (req, res) => {
     return res.status(400).json({ error: 'Email is required' });
   }
 
+  if (!password) {
+    return res.status(400).json({ error: 'Password is required' });
+  }
+
   try {
-    // Check if the email is already in use
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ error: 'Email already exists' });
@@ -29,13 +33,13 @@ const addUser = async (req, res) => {
     const newUser = new User({
       username,
       email,
-      image: image || null,
-      password: password || null,
-      dateOfBirth: dateOfBirth || null,
-      aboutMe: aboutMe || null,
-      status: status || 1,
-      phone: phone || null,
-      address: address || null
+      image,
+      password,
+      dateOfBirth,
+      aboutMe,
+      status:1,
+      phone,
+      address
     });
 
     await newUser.save();
@@ -44,7 +48,36 @@ const addUser = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const loginUser = async (req, res) => {
+  const { email, password } = req.body;
 
+  if (!email) {
+    return res.status(400).json({ error: 'Email is required' });
+  }
+
+  if (!password) {
+    return res.status(400).json({ error: 'Password is required' });
+  }
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ error: 'Invalid email or password' });
+    }
+
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Invalid email or password' });
+    }
+
+    const payload = { id: user.id, email: user.email };
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '24h' });
+
+    res.json({ token, user });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 const updateUser = async (req, res) => {
   try {
@@ -204,5 +237,6 @@ module.exports = {
   changePassword,
   loginWithGoogle,
   signupWithGoogle,
-  googleCallback
+  googleCallback,
+  loginUser
 };
