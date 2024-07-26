@@ -7,7 +7,7 @@ dotenv.config({ path: "./config.env" });
 const { cloudinary } = require("../config/cloudanary.js");
 const C_cloud_name = process.env.C_cloud_name
 require('../auth/auth.js');
-// Function to get all users
+
 const addUser = async (req, res) => {
   const { username, email, password, dateOfBirth, aboutMe, phone, address } = req.body;
   const image = req.files && req.files["image"] ? req.files["image"][0].path : null;
