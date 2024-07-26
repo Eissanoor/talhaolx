@@ -11,7 +11,7 @@ router.get('/login_with_google', userController.loginWithGoogle);
 router.get('/signup_with_google', userController.signupWithGoogle);
 router.get('/auth/google/callback', userController.googleCallback);
 router.post('/login', userController.loginUser);
-router.get('/',  authenticate , userController.getUsers)
+router.get('/',  userController.getUsers)
 router.post('/',upload.fields([{ name: 'image', maxCount: 1 }]), userController.addUser)
 router.put('/:id',upload.fields([{ name: 'image', maxCount: 1 }]), userController.updateUser)
 router.delete('/:id', userController.deleteUser)
