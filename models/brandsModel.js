@@ -238,6 +238,114 @@ const DeviceTypeSchema = new Schema({
   }, {
     timestamps: true,
   });
+   //----------------------------ConstructionState------------------------------------
+   const ConstructionStateSchema = new Schema({
+    subCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SubCategory",
+    },
+    footerCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "FooterCategory",
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    status: Number,
+  }, {
+    timestamps: true,
+  });
+  //----------------------------OperatingSystem------------------------------------
+  const OperatingSystemSchema = new Schema({
+    subCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SubCategory",
+    },
+    footerCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "FooterCategory",
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    status: Number,
+  }, {
+    timestamps: true,
+  });
+  //----------------------------HardDriveType------------------------------------
+  const HardDriveTypeSchema = new Schema({
+    subCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SubCategory",
+    },
+    footerCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "FooterCategory",
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    status: Number,
+  }, {
+    timestamps: true,
+  });
+  //----------------------------FunctionType------------------------------------
+  const FunctionTypeSchema = new Schema({
+    subCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SubCategory",
+    },
+    footerCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "FooterCategory",
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    status: Number,
+  }, {
+    timestamps: true,
+  });
+  //----------------------------SensorSize------------------------------------
+  const SensorSizeSchema = new Schema({
+    subCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SubCategory",
+    },
+    footerCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "FooterCategory",
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    status: Number,
+  }, {
+    timestamps: true,
+  });
+   //----------------------------Wifi------------------------------------
+   const WifiSchema = new Schema({
+    subCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SubCategory",
+    },
+    footerCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "FooterCategory",
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    status: Number,
+  }, {
+    timestamps: true,
+  });
 const Brand = mongoose.model("Brand", brandSchema);
 const Condition = mongoose.model("Condition", conditionSchema);
 const DeviceType = mongoose.model("DeviceType", DeviceTypeSchema);
@@ -251,6 +359,12 @@ const Construction = mongoose.model("Construction", ConstructionSchema);
 const Feature = mongoose.model("Feature", FeatureSchema);
 const Areaunit = mongoose.model("Areaunit", AreaunitSchema);
 const FloorLevel = mongoose.model("FloorLevel", FloorLevelSchema);
+const ConstructionState = mongoose.model("ConstructionState", ConstructionStateSchema);
+const OperatingSystem = mongoose.model("OperatingSystem", OperatingSystemSchema);
+const HardDriveType = mongoose.model("HardDriveType", HardDriveTypeSchema);
+const FunctionType = mongoose.model("FunctionType", FunctionTypeSchema);
+const SensorSize = mongoose.model("SensorSize", SensorSizeSchema);
+const Wifi = mongoose.model("Wifi", WifiSchema);
 module.exports = {
   Brand,
   Condition,
@@ -264,5 +378,11 @@ module.exports = {
   Construction,
   Feature,
   Areaunit,
-  FloorLevel
+  FloorLevel,
+  ConstructionState,
+  OperatingSystem,
+  HardDriveType,
+  FunctionType,
+  SensorSize,
+  Wifi
 };

@@ -4,6 +4,55 @@ const brandController = require('../controllers/brandController');
 const multer = require('multer');
 const { storage } = require("../config/cloudanary");
 const upload = multer({ storage: storage });
+
+//----------------------Wifi----------------------------------------------------
+
+router.get('/Wifi', brandController.getAllWifi)
+router.post('/Wifi', brandController.addnewWifi)
+router.put('/Wifi/:id', brandController.updateWifi)
+router.delete('/Wifi/:id', brandController.deleteWifi)
+router.get('/Wifi/:id', brandController.getWifiById)
+
+//----------------------SensorSize----------------------------------------------------
+
+router.get('/SensorSize', brandController.getAllSensorSize)
+router.post('/SensorSize', brandController.addnewSensorSize)
+router.put('/SensorSize/:id', brandController.updateSensorSize)
+router.delete('/SensorSize/:id', brandController.deleteSensorSize)
+router.get('/SensorSize/:id', brandController.getSensorSizeById)
+
+//----------------------FunctionType----------------------------------------------------
+
+router.get('/FunctionType', brandController.getAllFunctionType)
+router.post('/FunctionType', brandController.addnewFunctionType)
+router.put('/FunctionType/:id', brandController.updateFunctionType)
+router.delete('/FunctionType/:id', brandController.deleteFunctionType)
+router.get('/FunctionType/:id', brandController.getFunctionTypeById)
+
+//----------------------HardDriveType----------------------------------------------------
+
+router.get('/HardDriveType', brandController.getAllHardDriveType)
+router.post('/HardDriveType', brandController.addnewHardDriveType)
+router.put('/HardDriveType/:id', brandController.updateHardDriveType)
+router.delete('/HardDriveType/:id', brandController.deleteHardDriveType)
+router.get('/HardDriveType/:id', brandController.getHardDriveTypeById)
+//----------------------OperatingSystem----------------------------------------------------
+
+router.get('/OperatingSystem', brandController.getAllOperatingSystem)
+router.post('/OperatingSystem', brandController.addnewOperatingSystem)
+router.put('/OperatingSystem/:id', brandController.updateOperatingSystem)
+router.delete('/OperatingSystem/:id', brandController.deleteOperatingSystem)
+router.get('/OperatingSystem/:id', brandController.getOperatingSystemById)
+
+
+//----------------------ConstructionState----------------------------------------------------
+
+router.get('/ConstructionState', brandController.getAllConstructionState)
+router.post('/ConstructionState', brandController.addnewConstructionState)
+router.put('/ConstructionState/:id', brandController.updateConstructionState)
+router.delete('/ConstructionState/:id', brandController.deleteConstructionState)
+router.get('/ConstructionState/:id', brandController.getConstructionStateById)
+
 //----------------------Areaunit----------------------------------------------------
 
 router.get('/areaunit', brandController.getAllAreaunit)
