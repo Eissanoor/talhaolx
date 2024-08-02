@@ -5,6 +5,133 @@ const multer = require('multer');
 const { storage } = require("../config/cloudanary");
 const upload = multer({ storage: storage });
 
+//----------------------Language----------------------------------------------------
+
+router.get('/Language', brandController.getAllLanguage)
+router.post('/Language', brandController.addnewLanguage)
+router.put('/Language/:id', brandController.updateLanguage)
+router.delete('/Language/:id', brandController.deleteLanguage)
+router.get('/Language/:id', brandController.getLanguageById)
+//----------------------Origin----------------------------------------------------
+
+router.get('/Origin', brandController.getAllOrigin)
+router.post('/Origin', brandController.addnewOrigin)
+router.put('/Origin/:id', brandController.updateOrigin)
+router.delete('/Origin/:id', brandController.deleteOrigin)
+router.get('/Origin/:id', brandController.getOriginById)
+//----------------------Handmade----------------------------------------------------
+
+router.get('/Handmade', brandController.getAllHandmade)
+router.post('/Handmade', brandController.addnewHandmade)
+router.put('/Handmade/:id', brandController.updateHandmade)
+router.delete('/Handmade/:id', brandController.deleteHandmade)
+router.get('/Handmade/:id', brandController.getHandmadeById)
+//----------------------Materialtype----------------------------------------------------
+
+router.get('/Materialtype', brandController.getAllMaterialtype)
+router.post('/Materialtype', brandController.addnewMaterialtype)
+router.put('/Materialtype/:id', brandController.updateMaterialtype)
+router.delete('/Materialtype/:id', brandController.deleteMaterialtype)
+router.get('/Materialtype/:id', brandController.getMaterialtypeById)
+//----------------------Sex----------------------------------------------------
+
+router.get('/Sex', brandController.getAllSex)
+router.post('/Sex', brandController.addnewSex)
+router.put('/Sex/:id', brandController.updateSex)
+router.delete('/Sex/:id', brandController.deleteSex)
+router.get('/Sex/:id', brandController.getSexById)
+//----------------------Breed----------------------------------------------------
+
+router.get('/Breed', brandController.getAllBreed)
+router.post('/Breed', brandController.addnewBreed)
+router.put('/Breed/:id', brandController.updateBreed)
+router.delete('/Breed/:id', brandController.deleteBreed)
+router.get('/Breed/:id', brandController.getBreedById)
+//----------------------TypeofAd----------------------------------------------------
+
+router.get('/TypeofAd', brandController.getAllTypeofAd)
+router.post('/TypeofAd', brandController.addnewTypeofAd)
+router.put('/TypeofAd/:id', brandController.updateTypeofAd)
+router.delete('/TypeofAd/:id', brandController.deleteTypeofAd)
+router.get('/TypeofAd/:id', brandController.getTypeofAdById)
+//----------------------PositionType----------------------------------------------------
+
+router.get('/PositionType', brandController.getAllPositionType)
+router.post('/PositionType', brandController.addnewPositionType)
+router.put('/PositionType/:id', brandController.updatePositionType)
+router.delete('/PositionType/:id', brandController.deletePositionType)
+router.get('/PositionType/:id', brandController.getPositionTypeById)
+//----------------------CareerLevel----------------------------------------------------
+
+router.get('/CareerLevel', brandController.getAllCareerLevel)
+router.post('/CareerLevel', brandController.addnewCareerLevel)
+router.put('/CareerLevel/:id', brandController.updateCareerLevel)
+router.delete('/CareerLevel/:id', brandController.deleteCareerLevel)
+router.get('/CareerLevel/:id', brandController.getCareerLevelById)
+//----------------------HiringPerson----------------------------------------------------
+
+router.get('/HiringPerson', brandController.getAllHiringPerson)
+router.post('/HiringPerson', brandController.addnewHiringPerson)
+router.put('/HiringPerson/:id', brandController.updateHiringPerson)
+router.delete('/HiringPerson/:id', brandController.deleteHiringPerson)
+router.get('/HiringPerson/:id', brandController.getHiringPersonById)
+//----------------------RegistrationCity----------------------------------------------------
+
+router.get('/RegistrationCity', brandController.getAllRegistrationCity)
+router.post('/RegistrationCity', brandController.addnewRegistrationCity)
+router.put('/RegistrationCity/:id', brandController.updateRegistrationCity)
+router.delete('/RegistrationCity/:id', brandController.deleteRegistrationCity)
+router.get('/RegistrationCity/:id', brandController.getRegistrationCityById)
+//----------------------EngineCapacity----------------------------------------------------
+
+router.get('/EngineCapacity', brandController.getAllEngineCapacity)
+router.post('/EngineCapacity', brandController.addnewEngineCapacity)
+router.put('/EngineCapacity/:id', brandController.updateEngineCapacity)
+router.delete('/EngineCapacity/:id', brandController.deleteEngineCapacity)
+router.get('/EngineCapacity/:id', brandController.getEngineCapacityById)
+//----------------------EngineType----------------------------------------------------
+
+router.get('/EngineType', brandController.getAllEngineType)
+router.post('/EngineType', brandController.addnewEngineType)
+router.put('/EngineType/:id', brandController.updateEngineType)
+router.delete('/EngineType/:id', brandController.deleteEngineType)
+router.get('/EngineType/:id', brandController.getEngineTypeById)
+//----------------------Resolution----------------------------------------------------
+
+router.get('/Resolution', brandController.getAllResolution)
+router.post('/Resolution', brandController.addnewResolution)
+router.put('/Resolution/:id', brandController.updateResolution)
+router.delete('/Resolution/:id', brandController.deleteResolution)
+router.get('/Resolution/:id', brandController.getResolutionById)
+//----------------------ScreenSize----------------------------------------------------
+
+router.get('/ScreenSize', brandController.getAllScreenSize)
+router.post('/ScreenSize', brandController.addnewScreenSize)
+router.put('/ScreenSize/:id', brandController.updateScreenSize)
+router.delete('/ScreenSize/:id', brandController.deleteScreenSize)
+router.get('/ScreenSize/:id', brandController.getScreenSizeById)
+//----------------------MaxAperatureRange----------------------------------------------------
+
+router.get('/MaxAperatureRange', brandController.getAllMaxAperatureRange)
+router.post('/MaxAperatureRange', brandController.addnewMaxAperatureRange)
+router.put('/MaxAperatureRange/:id', brandController.updateMaxAperatureRange)
+router.delete('/MaxAperatureRange/:id', brandController.deleteMaxAperatureRange)
+router.get('/MaxAperatureRange/:id', brandController.getMaxAperatureRangeById)
+//----------------------MaxFocalLengthRange----------------------------------------------------
+
+router.get('/MaxFocalLengthRange', brandController.getAllMaxFocalLengthRange)
+router.post('/MaxFocalLengthRange', brandController.addnewMaxFocalLengthRange)
+router.put('/MaxFocalLengthRange/:id', brandController.updateMaxFocalLengthRange)
+router.delete('/MaxFocalLengthRange/:id', brandController.deleteMaxFocalLengthRange)
+router.get('/MaxFocalLengthRange/:id', brandController.getMaxFocalLengthRangeById)
+//----------------------Wifi----------------------------------------------------
+//----------------------MinFocalLengthRange----------------------------------------------------
+
+router.get('/MinFocalLengthRange', brandController.getAllMinFocalLengthRange)
+router.post('/MinFocalLengthRange', brandController.addnewMinFocalLengthRange)
+router.put('/MinFocalLengthRange/:id', brandController.updateMinFocalLengthRange)
+router.delete('/MinFocalLengthRange/:id', brandController.deleteMinFocalLengthRange)
+router.get('/MinFocalLengthRange/:id', brandController.getMinFocalLengthRangeById)
 //----------------------Wifi----------------------------------------------------
 
 router.get('/Wifi', brandController.getAllWifi)
