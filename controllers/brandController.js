@@ -8,6 +8,66 @@ dotenv.config({ path: "./config.env" });
 const { cloudinary } = require("../config/cloudanary.js");
 
 
+const models = [Brand, Condition, DeviceType, Type, Make, Furnished, Bedroom, bathroom, storey, Construction, Feature, Areaunit, ConstructionState,
+  OperatingSystem, HardDriveType, FunctionType, SensorSize, Wifi, MinFocalLengthRange, MaxFocalLengthRange, MaxAperatureRange, ScreenSize,
+  Resolution, EngineType, EngineCapacity, RegistrationCity, HiringPerson, CareerLevel, PositionType, TypeofAd, Breed, Sex, Materialtype, Handmade,
+  Origin, Language];
+
+const getSubCategoryByIdFromMasterData = async (id) => {
+  const results = await Promise.all(models.map(async (model) => {
+    try {
+      const result = await model.find({ subCategory: id }).populate('subCategory footerCategory').select('name subCategory footerCategory');
+      return result.length ? { model: model.modelName, data: result } : null;
+    } catch (error) {
+      return null;
+    }
+  }));
+  
+  return results.filter(result => result !== null);
+};
+const getAllModelsBySubCategory = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const results = await getSubCategoryByIdFromMasterData(id);
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'No matching subcategories found' });
+    }
+
+    res.status(200).json(results);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const getFooterCategoryByIdFromMasterData = async (id) => {
+  const results = await Promise.all(models.map(async (model) => {
+    try {
+      const result = await model.find({ footerCategory: id }).populate('subCategory footerCategory').select('name subCategory footerCategory');
+      return result.length ? { model: model.modelName, data: result } : null;
+    } catch (error) {
+      return null;
+    }
+  }));
+  
+  return results.filter(result => result !== null);
+};
+const getAllModelsByFooterCategory = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const results = await getFooterCategoryByIdFromMasterData(id);
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'No matching footer categories found' });
+    }
+
+    res.status(200).json(results);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+//------------------------filtering apis---------------------------
+
 const getAllLanguage = async (req, res) => {
   try {
     const categories = await Language.find();
@@ -4209,5 +4269,7 @@ const getAllbrand = async (req, res) => {
     addnewLanguage,
     updateLanguage,
     deleteLanguage,
-    getLanguageById
+    getLanguageById,
+    getAllModelsBySubCategory,
+    getAllModelsByFooterCategory
   };

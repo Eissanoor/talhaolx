@@ -4,6 +4,10 @@ const brandController = require('../controllers/brandController');
 const multer = require('multer');
 const { storage } = require("../config/cloudanary");
 const upload = multer({ storage: storage });
+//--------------------filteing api------------------------
+
+router.get('/filter_masterdata_in_subcategory/:id', brandController.getAllModelsBySubCategory)
+router.get('/getAllModelsByFooterCategory/:id', brandController.getAllModelsByFooterCategory)
 
 //----------------------Language----------------------------------------------------
 
