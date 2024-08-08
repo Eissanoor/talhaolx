@@ -71,11 +71,11 @@ const getallproduct = async (req, res) => {
   };
 const addnewproduct = async (req, res) => {
     try {
-        const { name, description, price, location, category, subcategory, user, ...optionalFields } = req.body;
+        const { name, description, price, location, Category, SubCategory, User, ...optionalFields } = req.body;
         
         // Validate required fields
-        if (!name || !price || !location || !category || !subcategory || !user) {
-          return res.status(400).json({ error: 'Name, price, location, category, subcategory, and user are required.' });
+        if (!name || !price || !location || !Category || !SubCategory || !User) {
+          return res.status(400).json({ error: 'Name, price, location, category, SubCategory, and User are required.' });
         }
     
         // Validate at least one image
@@ -92,9 +92,9 @@ const addnewproduct = async (req, res) => {
           description,
           price,
           location,
-          category,
-          subcategory,
-          user,
+          Category,
+          SubCategory,
+          User,
           images,
           ...optionalFields,
         });

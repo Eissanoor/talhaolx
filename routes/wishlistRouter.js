@@ -4,6 +4,6 @@ const wishlist = require('../controllers/wishlistController.js');
 
 
 
-router.get('/', wishlist.getWishlistByUserId)
-
+router.get('/:userId', wishlist.getWishlistByUserId)
+router.post('/:userId', wishlist.addOrRemoveProductFromWishlist)
 module.exports = router;
