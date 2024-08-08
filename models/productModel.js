@@ -21,170 +21,170 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  category: {
+  Category: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Category",
     required: true,
   },
-  subcategory: {
+  SubCategory: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "SubCategory",
     required: true,
   },
-  footercategory: {
+  FooterCategory: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "FooterCategory",
   },
-  user: {
+  User: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
-  brand: {
+  Brand: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Brand",
   },
-  condition: {
+  Condition: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Condition",
   },
-  deviceType: {
+  DeviceType: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "DeviceType",
   },
-  type: {
+  Type: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Type",
   },
-  make: {
+  Make: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Make",
   },
-  furnished: {
+  Furnished: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Furnished",
   },
-  bedroom: {
+  Bedroom: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Bedroom",
   },
-  bathroom: {
+  Bathroom: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Bathroom",
   },
-  storey: {
+  Storey: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Storey",
   },
-  construction: {
+  Construction: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Construction",
   },
-  feature: {
+  Feature: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Feature",
   },
-  areaUnit: {
+  Areaunit: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Areaunit",
   },
-  floorLevel: {
+  FloorLevel: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "FloorLevel",
   },
-  constructionState: {
+  ConstructionState: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "ConstructionState",
   },
-  operatingSystem: {
+  OperatingSystem: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "OperatingSystem",
   },
-  hardDriveType: {
+  HardDriveType: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "HardDriveType",
   },
-  functionType: {
+  FunctionType: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "FunctionType",
   },
-  sensorSize: {
+  SensorSize: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "SensorSize",
   },
-  wifi: {
+  Wifi: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Wifi",
   },
-  minFocalLengthRange: {
+  MinFocalLengthRange: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "MinFocalLengthRange",
   },
-  maxFocalLengthRange: {
+  MaxFocalLengthRange: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "MaxFocalLengthRange",
   },
-  maxApertureRange: {
+  MaxAperatureRange: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "MaxAperatureRange",
   },
-  screenSize: {
+  ScreenSize: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "ScreenSize",
   },
-  resolution: {
+  Resolution: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Resolution",
   },
-  engineType: {
+  EngineType: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "EngineType",
   },
-  engineCapacity: {
+  EngineCapacity: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "EngineCapacity",
   },
-  registrationCity: {
+  RegistrationCity: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "RegistrationCity",
   },
-  hiringPerson: {
+  HiringPerson: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "HiringPerson",
   },
-  careerLevel: {
+  CareerLevel: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "CareerLevel",
   },
-  positionType: {
+  PositionType: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "PositionType",
   },
-  typeOfAd: {
+  TypeofAd: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "TypeofAd",
   },
-  breed: {
+  Breed: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Breed",
   },
-  sex: {
+  Sex: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Sex",
   },
-  materialType: {
+  Materialtype: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Materialtype",
   },
-  handmade: {
+  Handmade: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Handmade",
   },
-  origin: {
+  Origin: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Origin",
   },
-  language: {
+  Language: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Language",
   },

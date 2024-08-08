@@ -113,3 +113,4 @@ const addnewproduct = async (req, res) => {
     getallproduct,
     addnewproduct
 };
+
