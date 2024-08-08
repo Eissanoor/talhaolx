@@ -11,7 +11,7 @@ const categoryRoutes = require('./routes/categoryRoutes');
 const subCategoryController = require('./routes/subCategoryRoutes')
 const footerCategoryRouter = require('./routes/footerCategoryRoutes')
 const brandRouter = require('./routes/brandRouter')
-
+const ProductRouter = require('./routes/productRouter')
 dotenv.config({ path: "./config.env" });
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET
 
@@ -39,6 +39,7 @@ app.use('/category', categoryRoutes);
 app.use('/subCategory', subCategoryController);
 app.use('/footerCategory', footerCategoryRouter);
 app.use('/brand', brandRouter);
+app.use('/product', ProductRouter)
 app.get('/', async (req, res)=> {
 res.status(200).json( {status:200,message:"HOME PAGE" , data:null})
 })

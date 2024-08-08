@@ -16,7 +16,7 @@ const models = [Brand, Condition, DeviceType, Type, Make, Furnished, Bedroom, ba
 const getSubCategoryByIdFromMasterData = async (id) => {
   const results = await Promise.all(models.map(async (model) => {
     try {
-      const result = await model.find({ subCategory: id }).populate('subCategory footerCategory').select('name subCategory footerCategory');
+      const result = await model.find({ subCategory: id }).populate('footerCategory').select('name footerCategory');
       return result.length ? { model: model.modelName, data: result } : null;
     } catch (error) {
       return null;
@@ -42,7 +42,7 @@ const getAllModelsBySubCategory = async (req, res) => {
 const getFooterCategoryByIdFromMasterData = async (id) => {
   const results = await Promise.all(models.map(async (model) => {
     try {
-      const result = await model.find({ footerCategory: id }).populate('subCategory footerCategory').select('name subCategory footerCategory');
+      const result = await model.find({ footerCategory: id }).populate('subCategory').select('name subCategory');
       return result.length ? { model: model.modelName, data: result } : null;
     } catch (error) {
       return null;
