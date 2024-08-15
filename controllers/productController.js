@@ -109,8 +109,63 @@ const addnewproduct = async (req, res) => {
 }
 
 }
+const updateProduct = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { name, description, price, location, Category, SubCategory, User, ...optionalFields } = req.body;
+  
+      // Check if the product exists
+      const product = await Product.findById(id);
+      if (!product) {
+        return res.status(404).json({ error: 'Product not found.' });
+      }
+  
+      // Update the product fields if they are provided in the request body
+      if (name) product.name = name;
+      if (description) product.description = description;
+      if (price) product.price = price;
+      if (location) product.location = location;
+      if (Category) product.Category = Category;
+      if (SubCategory) product.SubCategory = SubCategory;
+      if (User) product.User = User;
+  
+      // Update optional fields
+      Object.assign(product, optionalFields);
+  
+      // If new images are uploaded, update the images field
+      if (req.files && req.files.length > 0) {
+        const images = req.files.map(file => file.path);
+        product.images = images;
+      }
+  
+      // Save the updated product to the database
+      const updatedProduct = await product.save();
+  
+      res.status(200).json(updatedProduct);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
+  const deleteProduct = async (req, res) => {
+    try {
+      const { productId } = req.params;
+  
+      // Delete the product from the database
+      const product = await Product.findByIdAndDelete(productId);
+      if (!product) {
+        return res.status(404).json({ error: 'Product not found.' });
+      }
+  
+      res.status(200).json({ message: 'Product deleted successfully.' });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
+
   module.exports = {
     getallproduct,
-    addnewproduct
+    addnewproduct,
+    updateProduct,
+    deleteProduct
 };
 
