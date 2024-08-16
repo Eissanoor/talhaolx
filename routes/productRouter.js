@@ -6,6 +6,7 @@ const { storage } = require("../config/cloudanary");
 
 const upload = multer({ storage: storage });
 router.get('/', categoryController.getallproduct)
+router.get("/:id", categoryController.getProductById)
 router.post('/', upload.array('images', 8),categoryController.addnewproduct)
 router.put("/:id", upload.array('images', 8),categoryController.updateProduct)
 router.delete("/:productId", categoryController.deleteProduct)
