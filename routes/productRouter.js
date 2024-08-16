@@ -5,6 +5,8 @@ const multer = require('multer');
 const { storage } = require("../config/cloudanary");
 
 const upload = multer({ storage: storage });
+router.get("/getcategoryproduct", categoryController.gettencategoriesbyproduct)
+router.get("/getProductsByCategory/:categoryId", categoryController.getProductsByCategory)
 router.get('/', categoryController.getallproduct)
 router.get("/:id", categoryController.getProductById)
 router.post('/', upload.array('images', 8),categoryController.addnewproduct)
