@@ -58,16 +58,17 @@ const sendMessage = async (req, res) => {
         .populate("sender", "username userId image")
         .populate("receiver", "username userId image");
   
-      // Use a Set to store unique chat participants
+      // Use a Map to store unique chat participants
       const chatList = new Map();
   
       messages.forEach((message) => {
         const otherUser =
-          message.sender._id.toString() === userId
+          message.sender?._id?.toString() === userId
             ? message.receiver
             : message.sender;
   
-        if (!chatList.has(otherUser._id.toString())) {
+        // Ensure otherUser is not null before proceeding
+        if (otherUser && !chatList.has(otherUser._id.toString())) {
           chatList.set(otherUser._id.toString(), {
             user: otherUser,
             lastMessage: message.content,
@@ -80,7 +81,7 @@ const sendMessage = async (req, res) => {
       const chatsArray = Array.from(chatList.values());
   
       res.status(200).json(chatsArray);
-    } catch (error) {
+    }catch (error) {
       console.error("Error listing user chats:", error.message);
       res.status(500).json({ error: error.message });
     }
