@@ -21,6 +21,12 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  status: {
+    type: String,
+    required: true,
+    enum: ['pending', 'active', 'rejected'],
+    default: 'pending', // Set default value
+  },
   Category: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Category",
@@ -190,7 +196,7 @@ const productSchema = new mongoose.Schema({
   },
 });
 
-// Function to validate the image array length
+// Function to validate the image array lengthf
 function arrayLimit(val) {
   return val.length <= 8;
 }
