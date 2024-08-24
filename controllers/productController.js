@@ -361,6 +361,33 @@ const getProductsByCategory = async (req, res) => {
     res.status(500).json(error.message);
   }
 };
+const countProductsByStatus = async (req, res) => {
+  try {
+    const statusCounts = await Product.aggregate([
+      {
+        $group: {
+          _id: "$status",
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    const counts = {
+      active: 0,
+      pending: 0,
+      rejected: 0,
+    };
+
+    statusCounts.forEach(item => {
+      counts[item._id] = item.count;
+    });
+
+    res.status(200).json(counts);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
 
 
 
@@ -371,5 +398,6 @@ module.exports = {
   deleteProduct,
   getProductById,
   gettencategoriesbyproduct,
-  getProductsByCategory
+  getProductsByCategory,
+  countProductsByStatus
 };
