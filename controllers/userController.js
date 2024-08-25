@@ -209,10 +209,11 @@ const googleCallback = (req, res, next) => {
     }
 
     if (!user) {
-      if (req.query.state === 'login') {
-        return res.json('signup'); // Inform the frontend to redirect to the signup page
-      }
-      return res.json('login'); // Inform the frontend to redirect to the login page
+      const redirectUrl = req.query.state === 'login'
+        ? 'https://olxprojectscopy.vercel.app/signup'
+        : 'https://olxprojectscopy.vercel.app/login';
+      
+      return res.json({ success: false, redirectUrl });
     }
 
     // Successfully authenticated
@@ -220,10 +221,11 @@ const googleCallback = (req, res, next) => {
       if (err) {
         return next(err);
       }
-      return res.redirect('/dashboard');
+      return res.json({ success: true, redirectUrl: 'https://olxprojectscopy.vercel.app/' });
     });
   })(req, res, next);
 };
+
 
 
 

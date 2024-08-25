@@ -1,9 +1,8 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const bcrypt = require('bcrypt');
+
 const userSchema = new Schema({
-
-
   userId: {
     type: String,
     unique: true, // Ensure userId is unique
@@ -26,19 +25,19 @@ const userSchema = new Schema({
     }
   },
   image: String,
-  password:String,
-  dateOfBirth:String,
-  aboutMe:String,
+  password: String,
+  dateOfBirth: String,
+  aboutMe: String,
   status: Number,
   phone: String,
   address: String,
- 
   
   // Other user fields can go here
 });
 
 userSchema.pre('save', async function(next) {
-  if (this.isModified('password') || this.isNew) {
+  // Check if the password field is present and modified
+  if (this.password && (this.isModified('password') || this.isNew)) {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
   }
@@ -49,4 +48,5 @@ userSchema.pre('save', async function(next) {
 userSchema.methods.comparePassword = function(password) {
   return bcrypt.compare(password, this.password);
 };
+
 module.exports = mongoose.model("User", userSchema);
