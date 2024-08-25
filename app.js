@@ -14,6 +14,7 @@ const brandRouter = require('./routes/brandRouter')
 const ProductRouter = require('./routes/productRouter')
 const wishlist = require('./routes/wishlistRouter')
 const Chat = require('./routes/chatRouter')
+const AdminRoute = require('./routes/adminRoute')
 dotenv.config({ path: "./config.env" });
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET
 
@@ -44,6 +45,7 @@ app.use('/brand', brandRouter);
 app.use('/product', ProductRouter)
 app.use('/wishlist', wishlist)
 app.use("/chat", Chat)
+app.use("/admin", AdminRoute)
 app.get('/', async (req, res)=> {
 res.status(200).json( {status:200,message:"HOME PAGE" , data:null})
 })
