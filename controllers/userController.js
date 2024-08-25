@@ -210,8 +210,8 @@ const googleCallback = (req, res, next) => {
 
     if (!user) {
       const redirectUrl = req.query.state === 'login'
-        ? 'https://olxprojectscopy.vercel.app/signup'
-        : 'https://olxprojectscopy.vercel.app/login';
+        ? 'signup'
+        : 'login';
       
       return res.json({ success: false, redirectUrl });
     }
@@ -221,7 +221,7 @@ const googleCallback = (req, res, next) => {
       if (err) {
         return next(err);
       }
-      return res.json({ success: true, redirectUrl: 'https://olxprojectscopy.vercel.app/' });
+      return res.json({ success: true, redirectUrl: 'dashboard' });
     });
   })(req, res, next);
 };
