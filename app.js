@@ -28,7 +28,7 @@ app.use(helmet()); // Set security-related HTTP headers
 app.use(morgan('dev')); // HTTP request logger
 
 app.use(session({
-  secret: "helloworld",
+  secret: GOOGLE_CLIENT_SECRET,
   resave: false,
   saveUninitialized: true
 }));
