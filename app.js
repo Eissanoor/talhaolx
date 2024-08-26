@@ -24,8 +24,8 @@ app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors()); // Enable CORS
-app.use(helmet()); // Set security-related HTTP headers
-app.use(morgan('dev')); // HTTP request logger
+// app.use(helmet()); // Set security-related HTTP headers
+// app.use(morgan('dev')); // HTTP request logger
 
 app.use(session({
   secret: GOOGLE_CLIENT_SECRET,
