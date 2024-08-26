@@ -205,6 +205,8 @@ const signupWithGoogle = (req, res, next) => {
 const googleCallback = (req, res, next) => {
   passport.authenticate('google', async (err, user, info) => {
     if (err) {
+      console.log(err);
+      
       return next(err);
     }
 
@@ -219,6 +221,8 @@ const googleCallback = (req, res, next) => {
     // Successfully authenticated
     req.logIn(user, (err) => {
       if (err) {
+        console.log(err);
+        
         return next(err);
       }
       return res.json({ success: true, redirectUrl: 'dashboard' });
