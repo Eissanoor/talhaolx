@@ -388,7 +388,34 @@ const countProductsByStatus = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+const getallproductbyadmin = async (req, res) => {
+  try {
+    const products = await Product.find()
+      .populate({
+        path: "User",
+        select: "username email phone userId",
+      })
 
+    // Filter out products with any null references
+    const validProducts = products.filter((product) => {
+      const productObj = product.toObject();
+      return Object.keys(productObj).every((key) => {
+        if (Array.isArray(productObj[key])) {
+          return (
+            productObj[key].length > 0 &&
+            productObj[key].every((item) => item !== null)
+          );
+        }
+        return productObj[key] !== null;
+      });
+    });
+
+    res.status(200).json(validProducts);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json(error.message);
+  }
+};
 
 
 module.exports = {
@@ -399,5 +426,6 @@ module.exports = {
   getProductById,
   gettencategoriesbyproduct,
   getProductsByCategory,
-  countProductsByStatus
+  countProductsByStatus,
+  getallproductbyadmin
 };
