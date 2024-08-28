@@ -206,26 +206,32 @@ const googleCallback = (req, res, next) => {
   passport.authenticate('google', async (err, user, info) => {
     if (err) {
       console.log(err);
-      
       return next(err);
     }
 
     if (!user) {
-      const redirectUrl = req.query.state === 'login'
-        ? 'signup'
-        : 'login';
+      const redirectUrl = req.query.state === 'login' ? 'signup' : 'login';
+      const status = req.query.state === 'login' ? 0 : 1; // signup: status = 0, login: status = 1
       
-      return res.json({ success: false, redirectUrl });
+      return res.json({ success: false, redirectUrl, status });
     }
 
     // Successfully authenticated
     req.logIn(user, (err) => {
       if (err) {
         console.log(err);
-        
         return next(err);
       }
-      return res.json({ success: true, redirectUrl: 'dashboard' });
+
+      // Generate JWT token
+      const token = jwt.sign(
+        { id: user.id, email: user.email }, // Payload
+        process.env.JWT_SECRET, // Replace with your actual secret
+        { expiresIn: '1h' } // Token expiration time
+      );
+
+      const status = 2; // dashboard: status = 2
+      return res.json({ success: true, redirectUrl: 'dashboard', status, token });
     });
   })(req, res, next);
 };
