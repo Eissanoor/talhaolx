@@ -229,7 +229,7 @@ const googleCallback = (req, res, next) => {
       );
 
       // Redirect to client-side dashboard with token in query params
-      res.redirect(`${frontendbaseURL}/dashboard?token=${token}`);
+      res.redirect(`${frontendbaseURL}?token=${token}`);
     });
   })(req, res, next);
 };
