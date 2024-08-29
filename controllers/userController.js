@@ -212,7 +212,7 @@ const googleCallback = (req, res, next) => {
     if (!user) {
       const redirectUrl = req.query.state === 'login' ? '/signup' : '/login';
       const status = req.query.state === 'login' ? 0 : 1;
-      return res.redirect(`${frontendbaseURL}/${redirectUrl}?status=${status}`);
+      return res.redirect(`${process.env.CLIENT_URL}${redirectUrl}?status=${status}`);
     }
 
     req.logIn(user, (err) => {
@@ -221,12 +221,9 @@ const googleCallback = (req, res, next) => {
         return next(err);
       }
 
-      // Generate JWT token
-      const token = jwt.sign(
-        { id: user.id, email: user.email }, 
-        process.env.JWT_SECRET, 
-        { expiresIn: '1h' }
-      );
+      // Generate JWT token with userId included
+      const payload = { id: user.userId, email: user.email }; // Include userId in the payload
+      const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 
       // Redirect to client-side dashboard with token in query params
       res.redirect(`${frontendbaseURL}?token=${token}`);
