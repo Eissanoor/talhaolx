@@ -7,7 +7,7 @@ dotenv.config({ path: "./config.env" });
 const { cloudinary } = require("../config/cloudanary.js");
 const C_cloud_name = process.env.C_cloud_name
 require('../auth/auth.js');
-
+const frontendbaseURL = "https://olxprojectscopy.vercel.app"
 const addUser = async (req, res) => {
   const { username, email, password, dateOfBirth, aboutMe, phone, address } = req.body;
   const image = req.files && req.files["image"] ? req.files["image"][0].path : null;
@@ -210,13 +210,11 @@ const googleCallback = (req, res, next) => {
     }
 
     if (!user) {
-      const redirectUrl = req.query.state === 'login' ? 'signup' : 'login';
-      const status = req.query.state === 'login' ? 0 : 1; // signup: status = 0, login: status = 1
-      
-      return res.json({ success: false, redirectUrl, status });
+      const redirectUrl = req.query.state === 'login' ? '/signup' : '/login';
+      const status = req.query.state === 'login' ? 0 : 1;
+      return res.redirect(`${frontendbaseURL}/${redirectUrl}?status=${status}`);
     }
 
-    // Successfully authenticated
     req.logIn(user, (err) => {
       if (err) {
         console.log(err);
@@ -225,13 +223,13 @@ const googleCallback = (req, res, next) => {
 
       // Generate JWT token
       const token = jwt.sign(
-        { id: user.id, email: user.email }, // Payload
-        process.env.JWT_SECRET, // Replace with your actual secret
-        { expiresIn: '1h' } // Token expiration time
+        { id: user.id, email: user.email }, 
+        process.env.JWT_SECRET, 
+        { expiresIn: '1h' }
       );
 
-      const status = 2; // dashboard: status = 2
-      return res.json({ success: true, redirectUrl: 'dashboard', status, token });
+      // Redirect to client-side dashboard with token in query params
+      res.redirect(`${frontendbaseURL}/dashboard?token=${token}`);
     });
   })(req, res, next);
 };
