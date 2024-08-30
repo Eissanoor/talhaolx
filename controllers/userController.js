@@ -228,7 +228,7 @@ const googleCallback = (req, res, next) => {
       const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 
       // Redirect to client-side dashboard with token in query params
-      res.redirect(`${frontendbaseURL}?token=${token}`);
+      res.redirect(`${frontendbaseURL}?token=${token}&userId=${user.userId}`);
     });
   })(req, res, next);
 };
