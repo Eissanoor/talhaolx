@@ -7,8 +7,8 @@ const { cloudinary } = require("../config/cloudanary.js");
 const getallSlider = async (req, res) => {
     try {
       // Modify the find query to filter Slider with status = 1
-      const Slider = await Slider.find();
-      res.status(201).json(Slider);
+      const addSlider = await Slider.find();
+      res.status(201).json(addSlider);
     } catch (error) {
       console.log(error.message);
       res.status(500).json(error.message);
@@ -18,7 +18,6 @@ const getallSlider = async (req, res) => {
     try {
       const {  status } = req.body; // Get text fields from the body
       const imagePath = req.files["image"] ? req.files["image"][0].path : null; // Get image path if uploaded
-      const iconPath = req.files["icon"] ? req.files["icon"][0].path : null; // Get icon path if uploaded
   
       const category = new Slider({
        
@@ -26,7 +25,7 @@ const getallSlider = async (req, res) => {
         status,
       });
   
-      const addedSlider = await Slider.save();
+      const addedSlider = await category.save();
       res.status(201).json(addedSlider);
     } catch (error) {
       console.log(error.message);
@@ -36,11 +35,11 @@ const getallSlider = async (req, res) => {
   const updateSlider = async (req, res) => {
     try {
       const { id } = req.params;
-      const { name, status } = req.body;
+      const { status } = req.body;
   
-      const Slider = await Slider.findById(id);
-      if (!Slider) {
-        return res.status(404).json({ message: "Slider not found" });
+      const addSlider = await Slider.findById(id);
+      if (!addSlider) {
+        return res.status(404).json({ message: "addSlider not found" });
       }
   
       const getPublicIdFromUrl = (url) => {
@@ -55,10 +54,10 @@ const getallSlider = async (req, res) => {
         return publicId;
       };
   
-      let imagePath = Slider.image;
+      let imagePath = addSlider.image;
       if (req.files && req.files["image"] && req.files["image"][0]) {
-        if (Slider.image) {
-          const public_id = getPublicIdFromUrl(Slider.image);
+        if (addSlider.image) {
+          const public_id = getPublicIdFromUrl(addSlider.image);
           console.log("Deleting old image with public ID:", public_id);
           try {
             const result = await cloudinary.uploader.destroy(public_id, {
@@ -72,32 +71,16 @@ const getallSlider = async (req, res) => {
         imagePath = req.files["image"][0].path;
       }
   
-      let iconPath = Slider.icon;
-      if (req.files && req.files["icon"] && req.files["icon"][0]) {
-        if (Slider.icon) {
-          const public_id = getPublicIdFromUrl(Slider.icon);
-          console.log("Deleting old icon with public ID:", public_id);
-          try {
-            const result = await cloudinary.uploader.destroy(public_id, {
-              resource_type: "image",
-            });
-            console.log("Old icon deletion result:", result);
-          } catch (error) {
-            console.error("Error deleting old icon from Cloudinary:", error);
-          }
-        }
-        iconPath = req.files["icon"][0].path;
-      }
-  
+    
       
-      Slider.status = status || Slider.status;
-      Slider.image = imagePath;
+      addSlider.status = status || addSlider.status;
+      addSlider.image = imagePath;
     
   
-      const updatedSlider = await Slider.save();
-      res.status(200).json(updatedSlider);
+      const updatedaddSlider = await addSlider.save();
+      res.status(200).json(updatedaddSlider);
     } catch (error) {
-      console.error("Error updating Slider:", error.message);
+      console.error("Error updating addSlider:", error.message);
       res.status(500).json({ message: error.message });
     }
   };
@@ -105,9 +88,9 @@ const getallSlider = async (req, res) => {
       try {
         const { id } = req.params;
     
-        const Slider = await Slider.findById(id);
-        if (!Slider) {
-          return res.status(404).json({ message: 'Slider not found' });
+        const addSlider = await Slider.findById(id);
+        if (!addSlider) {
+          return res.status(404).json({ message: 'addSlider not found' });
         }
     
         const getPublicIdFromUrl = (url) => {
@@ -119,8 +102,8 @@ const getallSlider = async (req, res) => {
         };
     
         // Delete image from Cloudinary
-        if (Slider.image) {
-          const public_id = getPublicIdFromUrl(Slider.image);
+        if (addSlider.image) {
+          const public_id = getPublicIdFromUrl(addSlider.image);
           console.log('Deleting image with public ID:', public_id);
           try {
             const result = await cloudinary.uploader.destroy(public_id, { resource_type: 'image' });
@@ -131,23 +114,23 @@ const getallSlider = async (req, res) => {
         }
     
        
-        // Delete Slider from database
+        // Delete addSlider from database
         await Slider.findByIdAndDelete(id);
     
-        res.status(200).json({ message: 'Slider deleted successfully' });
+        res.status(200).json({ message: 'addSlider deleted successfully' });
       } catch (error) {
-        console.error('Error deleting Slider:', error.message);
+        console.error('Error deleting addSlider:', error.message);
         res.status(500).json({ message:error.message });
       }
     };
     const getSliderById = async (req, res) => {
       try {
         const { id } = req.params;
-        const Slider = await Slider.findById(id);
-        if (!Slider) {
+        const addSlider = await Slider.findById(id);
+        if (!addSlider) {
           return res.status(404).json({ message: 'Slider not found' });
         }
-        res.status(200).json(Slider);
+        res.status(200).json(addSlider);
       } catch (error) {
         console.log(error.message);
         res.status(500).json({ message: error.message });
