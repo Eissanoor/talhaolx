@@ -58,6 +58,73 @@ const getTrendingProducts = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const searchProduct = async (req, res) => {
+  try {
+    const { query } = req.body; // Search query from request body
+    const limit = parseInt(req.query.limit) || 10; // Get limit from query params or use default
+
+    if (query) {
+      // **Update Trending Products based on the Search Query**
+
+      // Find or create the search query entry
+      let searchEntry = await SearchQuery.findOne({ query });
+      if (!searchEntry) {
+        searchEntry = new SearchQuery({ query, searchCount: 1 }); // Initialize search count
+        await searchEntry.save();
+      } else {
+        searchEntry.searchCount += 1;
+        await searchEntry.save();
+      }
+
+      // Search for products matching the query across multiple fields
+      const products = await Product.find({
+        $or: [
+          { name: new RegExp(query, 'i') },
+          { description: new RegExp(query, 'i') },
+          { category: new RegExp(query, 'i') }, // Add more fields if needed
+        ],
+      });
+
+      if (products.length > 0) {
+        // Update or create a trending product entry for each product found
+        for (const product of products) {
+          let trendingEntry = await TrendingProduct.findOne({ productId: product._id });
+
+          if (!trendingEntry) {
+            trendingEntry = new TrendingProduct({
+              productId: product._id,
+              searchQuery: query,
+              trendScore: searchEntry.searchCount,
+              updatedAt: Date.now(),
+            });
+          } else {
+            trendingEntry.trendScore = searchEntry.searchCount;
+            trendingEntry.updatedAt = Date.now();
+          }
+
+          await trendingEntry.save();
+        }
+
+        // Return the matched products as the response
+        return res.status(200).json(products);
+      } else {
+        return res.status(404).json({ error: 'Product not found.' });
+      }
+    } else {
+      // **Get Trending Products if no query is provided**
+
+      const trendingProducts = await TrendingProduct.find()
+        .sort({ trendScore: -1, updatedAt: -1 })
+        .limit(limit)
+        .populate('productId', 'name image'); // Populate product details like name and image
+
+      return res.status(200).json(trendingProducts);
+    }
+  } catch (error) {
+    console.error('Error searching for products:', error);
+    return res.status(500).json({ error: error.message });
+  }
+};
 
 
 const getallproduct = async (req, res) => {
@@ -568,5 +635,6 @@ module.exports = {
   getallproductbyadmin,
   getProductsByUserId,
   updateTrendingProducts,
-  getTrendingProducts
+  getTrendingProducts,
+  searchProduct
 };
