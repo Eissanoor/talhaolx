@@ -1,9 +1,64 @@
 const Product = require("../models/productModel.js");
 const Category = require("../models/catagoryModel");
+const SearchQuery = require('../models/searchQueryModel.js');
+const TrendingProduct = require('../models/trendingProductModel.js');
 const path = require("path");
 var dotenv = require("dotenv");
 dotenv.config({ path: "./config.env" });
 const { cloudinary } = require("../config/cloudanary.js");
+
+const updateTrendingProducts = async (req, res) => {
+  try {
+    const { query } = req.body;
+
+    // Find or create the search query entry
+    let searchEntry = await SearchQuery.findOne({ query });
+    if (!searchEntry) {
+      searchEntry = new SearchQuery({ query });
+      await searchEntry.save();
+    } else {
+      await searchEntry.incrementSearchCount();
+    }
+
+    // Find a product based on the query
+    const product = await Product.findOne({ name: new RegExp(query, 'i') });
+
+    if (product) {
+      // Update or create a trending product entry
+      let trendingEntry = await TrendingProduct.findOne({ productId: product._id });
+      
+      if (!trendingEntry) {
+        trendingEntry = new TrendingProduct({ productId: product._id, searchQuery: query });
+      }
+
+      // Update trend score and timestamp
+      trendingEntry.trendScore = searchEntry.searchCount;
+      trendingEntry.updatedAt = Date.now();
+      await trendingEntry.save();
+
+      return res.status(200).json(trendingEntry);
+    } else {
+      return res.status(404).json({ error: "Product not found." });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const getTrendingProducts = async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 10; // Get limit from query params or use default
+
+    const trendingProducts = await TrendingProduct.find()
+      .sort({ trendScore: -1, updatedAt: -1 })
+      .limit(limit)
+      .populate('productId', 'name image');
+
+    res.status(200).json(trendingProducts);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 
 const getallproduct = async (req, res) => {
   try {
@@ -511,5 +566,7 @@ module.exports = {
   getProductsByCategory,
   countProductsByStatus,
   getallproductbyadmin,
-  getProductsByUserId
+  getProductsByUserId,
+  updateTrendingProducts,
+  getTrendingProducts
 };
