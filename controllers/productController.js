@@ -416,6 +416,89 @@ const getallproductbyadmin = async (req, res) => {
     res.status(500).json(error.message);
   }
 };
+const getProductsByUserId = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    const products = await Product.find({ User: userId })
+    .populate("Category", "name")
+    .populate("SubCategory", "name")
+    .populate("FooterCategory", "name")
+    .populate({
+      path: "User",
+      select: "username email phone userId",
+    })
+    .populate("Brand", "name")
+    .populate("Condition", "name")
+    .populate("DeviceType", "name")
+    .populate("Type", "name")
+    .populate("Make", "name")
+    .populate("Furnished", "name")
+    .populate("Bedroom", "name")
+    .populate("Bathroom", "name")
+    .populate("Storey", "name")
+    .populate("Construction", "name")
+    .populate("Feature", "name")
+    .populate("Areaunit", "name")
+    .populate("FloorLevel", "name")
+    .populate("ConstructionState", "name")
+    .populate("OperatingSystem", "name")
+    .populate("HardDriveType", "name")
+    .populate("FunctionType", "name")
+    .populate("SensorSize", "name")
+    .populate("Wifi", "name")
+    .populate("MinFocalLengthRange", "name")
+    .populate("MaxFocalLengthRange", "name")
+    .populate("MaxAperatureRange", "name")
+    .populate("ScreenSize", "name")
+    .populate("Resolution", "name")
+    .populate("EngineType", "name")
+    .populate("EngineCapacity", "name")
+    .populate("RegistrationCity", "name")
+    .populate("HiringPerson", "name")
+    .populate("CareerLevel", "name")
+    .populate("PositionType", "name")
+    .populate("TypeofAd", "name")
+    .populate("Breed", "name")
+    .populate("Sex", "name")
+    .populate("Materialtype", "name")
+    .populate("Handmade", "name")
+    .populate("Origin", "name")
+    .populate("Language", "name");
+
+    if (products.length === 0) {
+      return res.status(404).json({ message: "No products found for this user" });
+    }
+
+    // Filter out null references in each product
+    const validProducts = products.map((product) => {
+      const productObj = product.toObject();
+      const populatedFields = [
+        "category", "subCategory", "footerCategory", "user", "brand",
+        "condition", "deviceType", "type", "make", "furnished", "bedroom",
+        "bathroom", "storey", "construction", "feature", "areaUnit",
+        "floorLevel", "constructionState", "operatingSystem", "hardDriveType",
+        "functionType", "sensorSize", "wifi", "minFocalLengthRange", 
+        "maxFocalLengthRange", "maxAperatureRange", "screenSize", "resolution",
+        "engineType", "engineCapacity", "registrationCity", "hiringPerson",
+        "careerLevel", "positionType", "typeOfAd", "breed", "sex", 
+        "materialType", "handmade", "origin", "language"
+      ];
+      
+      const isValid = populatedFields.every((field) => productObj[field] !== null);
+      return isValid ? productObj : null;
+    }).filter(product => product !== null);
+
+    if (validProducts.length === 0) {
+      return res.status(400).json({ message: "No valid product data found for this user" });
+    }
+
+    res.status(200).json(validProducts);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 
 module.exports = {
@@ -427,5 +510,6 @@ module.exports = {
   gettencategoriesbyproduct,
   getProductsByCategory,
   countProductsByStatus,
-  getallproductbyadmin
+  getallproductbyadmin,
+  getProductsByUserId
 };
