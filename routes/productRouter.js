@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 const categoryController = require('../controllers/productController.js');
 const multer = require('multer');
-const { storage } = require("../config/cloudanary");
+const { upload } = require("../config/multerConfig.js");
 
-const upload = multer({ storage: storage });
+// const upload = multer({ storage: storage });
 router.get("/getcategoryproduct", categoryController.gettencategoriesbyproduct)
 router.get("/countProductsByStatus", categoryController.countProductsByStatus)
 router.get("/getallproductbyadmin", categoryController.getallproductbyadmin)

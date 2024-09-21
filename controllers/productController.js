@@ -2,7 +2,8 @@ const Product = require("../models/productModel.js");
 const Category = require("../models/catagoryModel");
 const SearchQuery = require('../models/searchQueryModel.js');
 const TrendingProduct = require('../models/trendingProductModel.js');
-const path = require("path");
+const fs = require('fs'); // Import the fs module for file system operations
+const path = require('path');
 var dotenv = require("dotenv");
 dotenv.config({ path: "./config.env" });
 const { cloudinary } = require("../config/cloudanary.js");
@@ -224,7 +225,7 @@ const addnewproduct = async (req, res) => {
     }
 
     // Get image URLs from the uploaded files
-    const images = req.files.map((file) => file.path);
+    const images = req.files.map((file) => `/uploads/${file.filename}`);
 
     // Create a new product
     const newProduct = new Product({
@@ -279,9 +280,24 @@ const updateProduct = async (req, res) => {
     // Update optional fields
     Object.assign(product, optionalFields);
 
-    // If new images are uploaded, update the images field
+    // Handle image updates
     if (req.files && req.files.length > 0) {
-      const images = req.files.map((file) => file.path);
+      // Delete old images from the filesystem
+      if (product.images && product.images.length > 0) {
+        // Assuming images are stored in a local uploads directory
+        for (const image of product.images) {
+          const filePath = path.join(__dirname, '../uploads', path.basename(image)); // Adjust the path as necessary
+          fs.unlink(filePath, (err) => {
+            if (err) {
+              console.error('Error deleting old image:', err);
+            } else {
+              console.log('Old image deleted:', filePath);
+            }
+          });
+        }
+      }
+      // Set new images
+      const images = req.files.map((file) => `/uploads/${file.filename}`); // Adjust as needed for your URL structure
       product.images = images;
     }
 
@@ -297,13 +313,30 @@ const deleteProduct = async (req, res) => {
   try {
     const { productId } = req.params;
 
-    // Delete the product from the database
-    const product = await Product.findByIdAndDelete(productId);
+    // Find the product by ID to get image paths
+    const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({ error: "Product not found." });
     }
 
-    res.status(200).json({ message: "Product deleted successfully." });
+    // Delete associated images from the filesystem
+    if (product.images && product.images.length > 0) {
+      for (const image of product.images) {
+        const filePath = path.join(__dirname, '../uploads', path.basename(image)); // Adjust path as necessary
+        fs.unlink(filePath, (err) => {
+          if (err) {
+            console.error('Error deleting image:', err);
+          } else {
+            console.log('Image deleted:', filePath);
+          }
+        });
+      }
+    }
+
+    // Delete the product from the database
+    await Product.findByIdAndDelete(productId);
+
+    res.status(200).json({ message: "Product and associated images deleted successfully." });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
