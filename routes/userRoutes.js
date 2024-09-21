@@ -3,9 +3,9 @@ const router = express.Router();
 const userController = require('../controllers/userController');
 const authenticate = require('../middleware/authMiddleware.js');
 const multer = require('multer');
-const { storage } = require("../config/cloudanary");
+const { upload } = require("../config/multerConfig.js");
 
-const upload = multer({ storage: storage });
+// const upload = multer({ storage: storage });
 
 router.get('/login_with_google', userController.loginWithGoogle);
 router.get('/signup_with_google', userController.signupWithGoogle);

@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 const sliderController = require('../controllers/sliderController');
 const multer = require('multer');
-const { storage } = require("../config/cloudanary");
+const { upload } = require("../config/multerConfig");
 
-const upload = multer({ storage: storage });
+// const upload = multer({ storage: storage });
 
 router.get('/', sliderController.getallSlider);
 router.get("/:id", sliderController.getSliderById)

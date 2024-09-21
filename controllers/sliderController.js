@@ -1,5 +1,6 @@
 const Slider = require("../models/sliderModel.js");
-const path = require("path");
+const fs = require('fs');
+const path = require('path');
 var dotenv = require("dotenv");
 dotenv.config({ path: "./config.env" });
 const { cloudinary } = require("../config/cloudanary.js");
@@ -16,15 +17,18 @@ const getallSlider = async (req, res) => {
   };
   const addnewSlider = async (req, res) => {
     try {
-      const {  status } = req.body; // Get text fields from the body
-      const imagePath = req.files["image"] ? req.files["image"][0].path : null; // Get image path if uploaded
+      const { status } = req.body;
+      
+      // Get image path if uploaded and prepend localhost URL
+      const imagePath = req.files?.image ? `/uploads/${req.files.image[0].filename}` : null;
   
+      // Create new slider entry
       const category = new Slider({
-       
         image: imagePath,
         status,
       });
   
+      // Save the new slider in the database
       const addedSlider = await category.save();
       res.status(201).json(addedSlider);
     } catch (error) {
@@ -39,86 +43,67 @@ const getallSlider = async (req, res) => {
   
       const addSlider = await Slider.findById(id);
       if (!addSlider) {
-        return res.status(404).json({ message: "addSlider not found" });
+        return res.status(404).json({ message: "Slider not found" });
       }
-  
-      const getPublicIdFromUrl = (url) => {
-        const urlParts = url.split("/");
-  
-        const fileName = urlParts.pop(); // Get the filename
-  
-        urlParts.pop(); // Remove the version part
-  
-        const publicId = `uploads/${fileName.split(".")[0]}`; // Combine folder path and filename without extension
-  
-        return publicId;
-      };
   
       let imagePath = addSlider.image;
-      if (req.files && req.files["image"] && req.files["image"][0]) {
+  
+      // Check if a new image is uploaded
+      if (req.files && req.files.image && req.files.image[0]) {
+        // Delete the old image from the local directory
         if (addSlider.image) {
-          const public_id = getPublicIdFromUrl(addSlider.image);
-          console.log("Deleting old image with public ID:", public_id);
-          try {
-            const result = await cloudinary.uploader.destroy(public_id, {
-              resource_type: "image",
-            });
-            console.log("Old image deletion result:", result);
-          } catch (error) {
-            console.error("Error deleting old image from Cloudinary:", error);
-          }
+          const oldImagePath = path.join(__dirname, '..', addSlider.image); // Construct the old image's path
+          fs.unlink(oldImagePath, (err) => {
+            if (err) {
+              console.error("Error deleting old image:", err);
+            } else {
+              console.log("Old image deleted:", oldImagePath);
+            }
+          });
         }
-        imagePath = req.files["image"][0].path;
+        
+        // Update with the new image path
+        imagePath = `/uploads/${req.files.image[0].filename}`;
       }
   
-    
-      
+      // Update other fields
       addSlider.status = status || addSlider.status;
       addSlider.image = imagePath;
-    
   
+      // Save the updated slider
       const updatedaddSlider = await addSlider.save();
       res.status(200).json(updatedaddSlider);
-    } catch (error) {
+    }  catch (error) {
       console.error("Error updating addSlider:", error.message);
       res.status(500).json({ message: error.message });
     }
   };
   const deleteSlider = async (req, res) => {
-      try {
-        const { id } = req.params;
-    
-        const addSlider = await Slider.findById(id);
-        if (!addSlider) {
-          return res.status(404).json({ message: 'addSlider not found' });
-        }
-    
-        const getPublicIdFromUrl = (url) => {
-          const urlParts = url.split('/');
-          const fileName = urlParts.pop(); // Get the filename
-          urlParts.pop(); // Remove the version part
-          const publicId = `uploads/${fileName.split('.')[0]}`; // Combine folder path and filename without extension
-          return publicId;
-        };
-    
-        // Delete image from Cloudinary
-        if (addSlider.image) {
-          const public_id = getPublicIdFromUrl(addSlider.image);
-          console.log('Deleting image with public ID:', public_id);
-          try {
-            const result = await cloudinary.uploader.destroy(public_id, { resource_type: 'image' });
-            console.log('Image deletion result:', result);
-          } catch (error) {
-            console.error('Error deleting image from Cloudinary:', error);
+    try {
+      const { id } = req.params;
+  
+      const addSlider = await Slider.findById(id);
+      if (!addSlider) {
+        return res.status(404).json({ message: 'Slider not found' });
+      }
+  
+      // Delete the image from the local directory
+      if (addSlider.image) {
+        const imagePath = path.join(__dirname, '..', addSlider.image); // Construct the image path
+        fs.unlink(imagePath, (err) => {
+          if (err) {
+            console.error('Error deleting image:', err);
+          } else {
+            console.log('Image deleted:', imagePath);
           }
-        }
-    
-       
-        // Delete addSlider from database
-        await Slider.findByIdAndDelete(id);
-    
-        res.status(200).json({ message: 'addSlider deleted successfully' });
-      } catch (error) {
+        });
+      }
+  
+      // Delete the slider from the database
+      await Slider.findByIdAndDelete(id);
+  
+      res.status(200).json({ message: 'Slider deleted successfully' });
+    } catch (error) {
         console.error('Error deleting addSlider:', error.message);
         res.status(500).json({ message:error.message });
       }

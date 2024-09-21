@@ -2,6 +2,8 @@ var dotenv = require("dotenv");
 const passport = require('passport');
 const session = require('express-session');
 const User = require('../models/userModel');
+const fs = require('fs');
+const path = require('path');
 const jwt = require('jsonwebtoken');
 dotenv.config({ path: "./config.env" });
 const { cloudinary } = require("../config/cloudanary.js");
@@ -10,7 +12,7 @@ require('../auth/auth.js');
 const frontendbaseURL = "https://olxprojectscopy.vercel.app"
 const addUser = async (req, res) => {
   const { username, email, password, dateOfBirth, aboutMe, phone, address } = req.body;
-  const image = req.files && req.files["image"] ? req.files["image"][0].path : null;
+  const imagePath = req.files?.image ? `/uploads/${req.files.image[0].filename}` : null;
 
   if (!username) {
     return res.status(400).json({ error: 'Username is required' });
@@ -33,7 +35,7 @@ const addUser = async (req, res) => {
     const newUser = new User({
       username,
       email,
-      image,
+      image:imagePath,
       password,
       dateOfBirth,
       aboutMe,
@@ -89,34 +91,29 @@ const updateUser = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const getPublicIdFromUrl = (url) => {
-      const urlParts = url.split("/");
-      const fileName = urlParts.pop(); // Get the filename
-      urlParts.pop(); // Remove the version part
-      const publicId = `uploads/${fileName.split(".")[0]}`; // Combine folder path and filename without extension
-      return publicId;
-    };
-
     let imagePath = user.image;
+
     if (req.files && req.files["image"] && req.files["image"][0]) {
+      // Delete the old image from the local directory
       if (user.image) {
-        const public_id = getPublicIdFromUrl(user.image);
-        console.log("Deleting old image with public ID:", public_id);
-        try {
-          const result = await cloudinary.uploader.destroy(public_id, {
-            resource_type: "image",
-          });
-          console.log("Old image deletion result:", result);
-        } catch (error) {
-          console.error("Error deleting old image from Cloudinary:", error);
-        }
+        const oldImagePath = path.join(__dirname, '..', user.image); // Construct the old image path
+        fs.unlink(oldImagePath, (err) => {
+          if (err) {
+            console.error("Error deleting old image:", err);
+          } else {
+            console.log("Old image deleted:", oldImagePath);
+          }
+        });
       }
-      imagePath = req.files["image"][0].path;
+
+      // Update with the new image path
+      imagePath = `/uploads/${req.files["image"][0].filename}`;
     }
 
+    // Update user fields
     user.username = username || user.username;
     user.email = email || user.email;
-    user.password = password || user.password;
+    user.password = password || user.password; // Ensure to hash the password if required
     user.dateOfBirth = dateOfBirth || user.dateOfBirth;
     user.aboutMe = aboutMe || user.aboutMe;
     user.status = status || user.status;
@@ -124,9 +121,10 @@ const updateUser = async (req, res) => {
     user.address = address || user.address;
     user.image = imagePath;
 
+    // Save the updated user
     const updatedUser = await user.save();
     res.status(200).json(updatedUser);
-  } catch (error) {
+  }catch (error) {
     console.error("Error updating user:", error.message);
     res.status(500).json({ message: error.message });
   }
@@ -158,13 +156,30 @@ const deleteUser = async (req, res) => {
   const { id } = req.params;
 
   try {
-      const user = await User.findByIdAndDelete(id);
+    // Find the user to get their image path before deletion
+    const user = await User.findById(id);
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
 
-      if (!user) {
-          return res.status(404).json({ error: 'User not found' });
-      }
+    // Construct the path for the user's image
+    if (user.image) {
+      const imagePath = path.join(__dirname, '..', user.image); // Adjust the path as necessary
+      // Delete the user's image from the local directory
+      fs.unlink(imagePath, (err) => {
+        if (err) {
+          console.error("Error deleting user's image:", err);
+        } else {
+          console.log("User's image deleted:", imagePath);
+        }
+      });
+    }
 
-      res.status(200).json({ message: 'User deleted successfully' });
+    // Proceed to delete the user
+    await User.findByIdAndDelete(id);
+
+    res.status(200).json({ message: 'User deleted successfully' });
   } catch (error) {
       res.status(500).json({ error: error.message });
   }
