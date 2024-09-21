@@ -3554,7 +3554,7 @@ const getAllMake = async (req, res) => {
   };
   const addnewMake = async (req, res) => {
     const { name, subCategory, footerCategory, status } = req.body;
-    const imagePath = req.files?.image ? `https://backend.pakardi.com/uploads/${req.files.image[0].filename}` : null;
+    const imagePath = req.files?.image ? `/uploads/${req.files.image[0].filename}` : null;
     if (!name) {
       return res.status(400).json({ error: 'Name is required' });
     }
@@ -3620,7 +3620,7 @@ const getAllMake = async (req, res) => {
           deleteLocalFile(make.image);
         }
         // Update to the new image path
-        imagePath = `https://backend.pakardi.com/uploads/${req.files['image'][0].filename}`;
+        imagePath = `/uploads/${req.files['image'][0].filename}`;
       }
   
       // Update the fields
