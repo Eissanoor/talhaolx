@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
+const path = require('path');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const dotenv = require('dotenv');
@@ -28,7 +29,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors()); // Enable CORS
 // app.use(helmet()); // Set security-related HTTP headers
 // app.use(morgan('dev')); // HTTP request logger
-
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(session({
   secret: GOOGLE_CLIENT_SECRET,
   resave: false,

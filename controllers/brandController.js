@@ -7,7 +7,8 @@ var dotenv = require("dotenv");
 dotenv.config({ path: "./config.env" });
 const { cloudinary } = require("../config/cloudanary.js");
 
-
+const path = require("path");
+const fs = require('fs');
 const models = [Brand, Condition, DeviceType, Type, Make, Furnished, Bedroom, bathroom, storey, Construction, Feature, Areaunit, ConstructionState,
   OperatingSystem, HardDriveType, FunctionType, SensorSize, Wifi, MinFocalLengthRange, MaxFocalLengthRange, MaxAperatureRange, ScreenSize,
   Resolution, EngineType, EngineCapacity, RegistrationCity, HiringPerson, CareerLevel, PositionType, TypeofAd, Breed, Sex, Materialtype, Handmade,
@@ -3507,30 +3508,31 @@ const getAllMake = async (req, res) => {
     const { id } = req.params;
   
     try {
-        const category = await Make.findById(id);
-        if (!category) {
-          return res.status(404).json({ message: 'Make not found' });
-        }
-      const getPublicIdFromUrl = (url) => {
-        const urlParts = url.split('/');
-        const fileName = urlParts.pop(); // Get the filename
-        urlParts.pop(); // Remove the version part
-        const publicId = `uploads/${fileName.split('.')[0]}`; // Combine folder path and filename without extension
-        return publicId;
+      const make = await Make.findById(id);
+      if (!make) {
+        return res.status(404).json({ message: 'Make not found' });
+      }
+  
+      // Function to delete a file from the local directory
+      const deleteLocalFile = (filePath) => {
+        const absolutePath = path.join(__dirname, '../', filePath); // Construct the absolute path
+        fs.unlink(absolutePath, (err) => {
+          if (err) {
+            console.error(`Error deleting file ${absolutePath}:`, err);
+          } else {
+            console.log(`Successfully deleted file: ${absolutePath}`);
+          }
+        });
       };
   
-      // Delete image from Cloudinary
-      if (category.image) {
-        const public_id = getPublicIdFromUrl(category.image);
-        console.log('Deleting image with public ID:', public_id);
-        try {
-          const result = await cloudinary.uploader.destroy(public_id, { resource_type: 'image' });
-          console.log('Image deletion result:', result);
-        } catch (error) {
-          console.error('Error deleting image from Cloudinary:', error);
-        }
+      // Delete image from local directory
+      if (make.image) {
+        deleteLocalFile(make.image);
       }
+  
+      // Delete the make record from the database
       await Make.findByIdAndDelete(id);
+  
       res.status(200).json({ message: 'Make deleted successfully' });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -3552,7 +3554,7 @@ const getAllMake = async (req, res) => {
   };
   const addnewMake = async (req, res) => {
     const { name, subCategory, footerCategory, status } = req.body;
-    const imagePath = req.files["image"] ? req.files["image"][0].path : null;
+    const imagePath = req.files?.image ? `/uploads/${req.files.image[0].filename}` : null;
     if (!name) {
       return res.status(400).json({ error: 'Name is required' });
     }
@@ -3593,61 +3595,45 @@ const getAllMake = async (req, res) => {
     }
   
     try {
-      const brand = await Make.findById(id);
-
-      const getPublicIdFromUrl = (url) => {
-        const urlParts = url.split("/");
+      const make = await Make.findById(id);
+      if (!make) {
+        return res.status(404).json({ message: 'Make not found' });
+      }
   
-        const fileName = urlParts.pop(); // Get the filename
-  
-        urlParts.pop(); // Remove the version part
-  
-        const publicId = `uploads/${fileName.split(".")[0]}`; // Combine folder path and filename without extension
-  
-        return publicId;
+      // Function to delete a file from the local directory
+      const deleteLocalFile = (filePath) => {
+        const absolutePath = path.join(__dirname, '../', filePath); // Construct the absolute path
+        fs.unlink(absolutePath, (err) => {
+          if (err) {
+            console.error(`Error deleting file ${absolutePath}:`, err);
+          } else {
+            console.log(`Successfully deleted file: ${absolutePath}`);
+          }
+        });
       };
   
-      let imagePath = brand.image;
-      if (req.files && req.files["image"] && req.files["image"][0]) {
-        if (brand.image) {
-          const public_id = getPublicIdFromUrl(brand.image);
-          console.log("Deleting old image with public ID:", public_id);
-          try {
-            const result = await cloudinary.uploader.destroy(public_id, {
-              resource_type: "image",
-            });
-            console.log("Old image deletion result:", result);
-          } catch (error) {
-            console.error("Error deleting old image from Cloudinary:", error);
-          }
+      // Check if a new image is provided
+      let imagePath = make.image; // Keep the old image if no new one is uploaded
+      if (req.files && req.files['image'] && req.files['image'][0]) {
+        // Delete the old image from the local directory
+        if (make.image) {
+          deleteLocalFile(make.image);
         }
-        imagePath = req.files["image"][0].path;
-      }
-      if (!brand) {
-        return res.status(404).json({ error: 'Make not found' });
+        // Update to the new image path
+        imagePath = `/uploads/${req.files['image'][0].filename}`;
       }
   
-      if (name) {
-        brand.name = name;
-      }
+      // Update the fields
+      make.name = name || make.name;
+      make.subCategory = subCategory || null;
+      make.footerCategory = footerCategory || null;
+      make.status = status || make.status;
+      make.image = imagePath;
   
-      if (subCategory) {
-        brand.subCategory = subCategory;
-        brand.footerCategory = null;  // Clear footerCategory if subCategory is provided
-      }
-  
-      if (footerCategory) {
-        brand.footerCategory = footerCategory;
-        brand.subCategory = null;  // Clear subCategory if footerCategory is provided
-      }
-  
-      if (status !== undefined) {
-        brand.status = status;
-      }
-  
-      await brand.save();
-      res.status(200).json(brand);
-    } catch (error) {
+      // Save the updated Make
+      const updatedMake = await make.save();
+      res.status(200).json(updatedMake);
+    }  catch (error) {
       res.status(500).json({ error: error.message });
     }
   };
