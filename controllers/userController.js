@@ -225,8 +225,16 @@ const googleCallback = (req, res, next) => {
     }
 
     if (!user) {
-      const redirectUrl = req.query.state === 'login' ? '/signup' : '/login';
       const status = req.query.state === 'login' ? 0 : 1;
+
+      // Redirect based on the status value
+      if (status === 0) {
+        return res.redirect('https://pakardi.com/SinUpForm');
+      } else if (status === 1) {
+        return res.redirect('https://pakardi.com/LoginForm');
+      }
+
+      const redirectUrl = req.query.state === 'login' ? '/signup' : '/login';
       return res.redirect(`${process.env.CLIENT_URL}${redirectUrl}?status=${status}`);
     }
 
@@ -238,8 +246,8 @@ const googleCallback = (req, res, next) => {
 
       // Generate JWT token with userId included
       const payload = { id: user.userId, email: user.email }; // Include userId in the payload
-      console.log(payload,"------------------");
-      
+      console.log(payload, "------------------");
+
       const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 
       // Redirect to client-side dashboard with token in query params
@@ -247,6 +255,7 @@ const googleCallback = (req, res, next) => {
     });
   })(req, res, next);
 };
+
 
 
 
