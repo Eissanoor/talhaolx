@@ -245,13 +245,13 @@ const googleCallback = (req, res, next) => {
       }
 
       // Generate JWT token with userId included
-      const payload = { id: user.userId, email: user.email }; // Include userId in the payload
+      const payload = { id: user._id, email: user.email }; // Include userId in the payload
       console.log(payload, "------------------");
 
       const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 
       // Redirect to client-side dashboard with token in query params
-      res.redirect(`${frontendbaseURL}?token=${token}&userId=${user.userId}`);
+      res.redirect(`${frontendbaseURL}?token=${token}&userId=${user._id}`);
     });
   })(req, res, next);
 };
