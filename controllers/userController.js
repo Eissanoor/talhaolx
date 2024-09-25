@@ -9,7 +9,7 @@ dotenv.config({ path: "./config.env" });
 const { cloudinary } = require("../config/cloudanary.js");
 const C_cloud_name = process.env.C_cloud_name
 require('../auth/auth.js');
-const frontendbaseURL = "http://localhost:592"
+const frontendbaseURL = "https://pakardi.com"
 const addUser = async (req, res) => {
   const { username, email, password, dateOfBirth, aboutMe, phone, address } = req.body;
   const imagePath = req.files?.image ? `/uploads/${req.files.image[0].filename}` : null;
