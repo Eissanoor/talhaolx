@@ -18,6 +18,7 @@ const Chat = require('./routes/chatRouter')
 const AdminRoute = require('./routes/adminRoute')
 const SliderRoute = require('./routes/sliderRoute')
 const reactNativeRoute = require('./routes/reactNativeRoute')
+const aboutRoute = require('./routes/about&contactRoute')
 dotenv.config({ path: "./config.env" });
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET
 
@@ -51,6 +52,7 @@ app.use("/chat", Chat)
 app.use("/admin", AdminRoute)
 app.use("/slider", SliderRoute)
 app.use("/reactNativeRoute", reactNativeRoute)
+app.use("/about", aboutRoute)
 app.get('/', async (req, res)=> {
 res.status(200).json( {status:200,message:"HOME PAGE" , data:null})
 })
