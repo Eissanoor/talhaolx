@@ -22,7 +22,6 @@ const addUser = async (req, res) => {
     address,  
     id_cardNo, // Remove default placeholder
     taxNo,
-    currency 
   } = req.body;
 
   const isGemstone = req.body.isGemstone || false;
@@ -76,7 +75,7 @@ const addUser = async (req, res) => {
       status: 1,
       phone,
       address,
-      currency,
+   
       isGemstone,
       id_cardNo: isGemstone ? id_cardNo : null,
       taxNo: isGemstone ? taxNo : null,
@@ -136,7 +135,7 @@ const updateUser = async (req, res) => {
       isGemstone, 
       id_cardNo, 
       taxNo,
-      currency 
+    
     } = req.body;
 
     const user = await User.findById(id);
@@ -205,7 +204,7 @@ const updateUser = async (req, res) => {
     user.status = status || user.status;
     user.phone = phone || user.phone;
     user.address = address || user.address;
-    user.currency = currency || user.currency;
+  
     user.image = imagePath;
     user.isGemstone = isGemstone !== undefined ? isGemstone : user.isGemstone;
     user.id_cardNo = isGemstone ? id_cardNo : null;
