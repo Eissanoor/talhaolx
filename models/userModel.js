@@ -50,7 +50,7 @@ const userSchema = new Schema({
       message: "Please enter a valid ID card number in the format 'XXXXX-XXXXXXX-X'"
     }
   },
-  currency:String,
+  
   taxNo:Number,
   pictureBusinessCertificate:String,
   // Other user fields can go here

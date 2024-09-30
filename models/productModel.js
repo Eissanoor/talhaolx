@@ -27,6 +27,7 @@ const productSchema = new mongoose.Schema({
     enum: ['pending', 'active', 'rejected'],
     default: 'pending', // Set default value
   },
+  currency:String,
   Category: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Category",
