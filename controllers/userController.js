@@ -5,15 +5,33 @@ const User = require('../models/userModel');
 const fs = require('fs');
 const path = require('path');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 dotenv.config({ path: "./config.env" });
 const { cloudinary } = require("../config/cloudanary.js");
 const C_cloud_name = process.env.C_cloud_name
 require('../auth/auth.js');
 const frontendbaseURL = "https://pakardi.com"
 const addUser = async (req, res) => {
-  const { username, email, password, dateOfBirth, aboutMe, phone, address } = req.body;
-  const imagePath = req.files?.image ? `/uploads/${req.files.image[0].filename}` : null;
+  const { 
+    username, 
+    email, 
+    password, 
+    dateOfBirth, 
+    aboutMe, 
+    phone, 
+    address,  
+    id_cardNo, // Remove default placeholder
+    taxNo 
+  } = req.body;
 
+  const isGemstone = req.body.isGemstone || false;
+
+  const imagePath = req.files?.image ? `/uploads/${req.files.image[0].filename}` : null;
+  const pictureBusinessCertificate = req.files?.pictureBusinessCertificate 
+    ? `/uploads/${req.files.pictureBusinessCertificate[0].filename}` 
+    : null;
+
+  // Validate basic required fields
   if (!username) {
     return res.status(400).json({ error: 'Username is required' });
   }
@@ -26,30 +44,51 @@ const addUser = async (req, res) => {
     return res.status(400).json({ error: 'Password is required' });
   }
 
+  // If isGemstone is true, validate the additional fields
+  if (isGemstone) {
+    if (!id_cardNo) {
+      return res.status(400).json({ error: 'ID card number is required for gemstone users' });
+    }
+    if (!taxNo) {
+      return res.status(400).json({ error: 'Tax number is required for gemstone users' });
+    }
+    if (!pictureBusinessCertificate) {
+      return res.status(400).json({ error: 'Business certificate image is required for gemstone users' });
+    }
+  }
+
   try {
+    // Check if the email already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ error: 'Email already exists' });
     }
 
+    // Create new user object
     const newUser = new User({
       username,
       email,
-      image:imagePath,
+      image: imagePath,
       password,
       dateOfBirth,
       aboutMe,
-      status:1,
+      status: 1,
       phone,
-      address
+      address,
+      isGemstone,
+      id_cardNo: isGemstone ? id_cardNo : null,
+      taxNo: isGemstone ? taxNo : null,
+      pictureBusinessCertificate: isGemstone ? pictureBusinessCertificate : null
     });
 
+    // Save the user to the database
     await newUser.save();
     res.status(201).json(newUser);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
@@ -80,11 +119,22 @@ const loginUser = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const { username, email, password, dateOfBirth, aboutMe, status, phone, address } = req.body;
+    const { 
+      username, 
+      email, 
+      password, 
+      dateOfBirth, 
+      aboutMe, 
+      status, 
+      phone, 
+      address, 
+      isGemstone, 
+      id_cardNo, 
+      taxNo 
+    } = req.body;
 
     const user = await User.findById(id);
     if (!user) {
@@ -92,11 +142,12 @@ const updateUser = async (req, res) => {
     }
 
     let imagePath = user.image;
+    let pictureBusinessCertificatePath = user.pictureBusinessCertificate;
 
+    // Handle new image upload
     if (req.files && req.files["image"] && req.files["image"][0]) {
-      // Delete the old image from the local directory
       if (user.image) {
-        const oldImagePath = path.join(__dirname, '..', user.image); // Construct the old image path
+        const oldImagePath = path.join(__dirname, '..', user.image);
         fs.unlink(oldImagePath, (err) => {
           if (err) {
             console.error("Error deleting old image:", err);
@@ -105,26 +156,63 @@ const updateUser = async (req, res) => {
           }
         });
       }
-
-      // Update with the new image path
       imagePath = `/uploads/${req.files["image"][0].filename}`;
+    }
+
+    // Handle new pictureBusinessCertificate upload
+    if (req.files && req.files["pictureBusinessCertificate"] && req.files["pictureBusinessCertificate"][0]) {
+      if (user.pictureBusinessCertificate) {
+        const oldCertificatePath = path.join(__dirname, '..', user.pictureBusinessCertificate);
+        fs.unlink(oldCertificatePath, (err) => {
+          if (err) {
+            console.error("Error deleting old business certificate:", err);
+          } else {
+            console.log("Old business certificate deleted:", oldCertificatePath);
+          }
+        });
+      }
+      pictureBusinessCertificatePath = `/uploads/${req.files["pictureBusinessCertificate"][0].filename}`;
+    }
+
+    // If isGemstone is true, validate and update gemstone-related fields
+    if (isGemstone) {
+      if (!id_cardNo) {
+        return res.status(400).json({ error: 'ID card number is required for gemstone users' });
+      }
+      if (!taxNo) {
+        return res.status(400).json({ error: 'Tax number is required for gemstone users' });
+      }
+      if (!pictureBusinessCertificatePath) {
+        return res.status(400).json({ error: 'Business certificate image is required for gemstone users' });
+      }
     }
 
     // Update user fields
     user.username = username || user.username;
     user.email = email || user.email;
-    user.password = password || user.password; // Ensure to hash the password if required
+    
+    // Hash password if it's being updated
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(password, salt);
+    }
+    
     user.dateOfBirth = dateOfBirth || user.dateOfBirth;
     user.aboutMe = aboutMe || user.aboutMe;
     user.status = status || user.status;
     user.phone = phone || user.phone;
     user.address = address || user.address;
     user.image = imagePath;
+    user.isGemstone = isGemstone !== undefined ? isGemstone : user.isGemstone;
+    user.id_cardNo = isGemstone ? id_cardNo : null;
+    user.taxNo = isGemstone ? taxNo : null;
+    user.pictureBusinessCertificate = isGemstone ? pictureBusinessCertificatePath : null;
 
     // Save the updated user
     const updatedUser = await user.save();
     res.status(200).json(updatedUser);
-  }catch (error) {
+
+  } catch (error) {
     console.error("Error updating user:", error.message);
     res.status(500).json({ message: error.message });
   }

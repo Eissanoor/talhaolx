@@ -31,7 +31,27 @@ const userSchema = new Schema({
   status: Number,
   phone: String,
   address: String,
-  
+  isGemstone: {
+    type: Boolean,
+    default: false
+  },
+  id_cardNo: {
+    type: String,
+    trim: true,
+    default: null, // Accept null values
+    validate: {
+      validator: function(value) {
+        // Only validate if value is not null or empty, and isGemstone is true
+        if (this.isGemstone && value) {
+          return /^\d{5}-\d{7}-\d{1}$/.test(value); // Updated regular expression
+        }
+        return true; // Allow null or empty values
+      },
+      message: "Please enter a valid ID card number in the format 'XXXXX-XXXXXXX-X'"
+    }
+  },
+  taxNo:Number,
+  pictureBusinessCertificate:String,
   // Other user fields can go here
 });
 
