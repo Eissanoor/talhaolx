@@ -10,7 +10,7 @@ const commentSchema = new Schema({
     productId: { 
         type: Schema.Types.ObjectId, 
         ref: 'Product', 
-        required: true 
+      
     },
     commentText: { 
         type: String, 
