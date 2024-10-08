@@ -43,6 +43,8 @@ const userSchema = new Schema({
   
   taxNo:Number,
   pictureBusinessCertificate:String,
+  frontImage:String,
+  backImage:String,
   // Other user fields can go here
 });
 

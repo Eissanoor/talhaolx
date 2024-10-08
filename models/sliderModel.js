@@ -5,6 +5,9 @@ const sliderSchema = new Schema({
   image: {
     type: String,
   },
+  url: {
+    type: String,
+  },
   status:Number,
 }, {
   timestamps: true,

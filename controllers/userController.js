@@ -31,6 +31,14 @@ const addUser = async (req, res) => {
     ? `/uploads/${req.files.pictureBusinessCertificate[0].filename}` 
     : null;
 
+    const frontImage = req.files?.frontImage 
+    ? `/uploads/${req.files.frontImage[0].filename}` 
+    : null;
+
+    const backImage = req.files?.backImage 
+    ? `/uploads/${req.files.backImage[0].filename}` 
+    : null;
+
   // Validate basic required fields
   if (!username) {
     return res.status(400).json({ error: 'Username is required' });
@@ -54,6 +62,12 @@ const addUser = async (req, res) => {
     }
     if (!pictureBusinessCertificate) {
       return res.status(400).json({ error: 'Business certificate image is required for gemstone users' });
+    }
+    if (!frontImage) {
+      return res.status(400).json({ error: 'frontImage image is required for gemstone users' });
+    }
+    if (!backImage) {
+      return res.status(400).json({ error: 'backImage image is required for gemstone users' });
     }
   }
 
@@ -79,7 +93,9 @@ const addUser = async (req, res) => {
       isGemstone,
       id_cardNo: isGemstone ? id_cardNo : null,
       taxNo: isGemstone ? taxNo : null,
-      pictureBusinessCertificate: isGemstone ? pictureBusinessCertificate : null
+      pictureBusinessCertificate: isGemstone ? pictureBusinessCertificate : null,
+      frontImage: isGemstone ? frontImage : null,
+      backImage: isGemstone ? backImage : null
     });
 
     // Save the user to the database
@@ -134,8 +150,7 @@ const updateUser = async (req, res) => {
       address, 
       isGemstone, 
       id_cardNo, 
-      taxNo,
-    
+      taxNo 
     } = req.body;
 
     const user = await User.findById(id);
@@ -145,38 +160,57 @@ const updateUser = async (req, res) => {
 
     let imagePath = user.image;
     let pictureBusinessCertificatePath = user.pictureBusinessCertificate;
+    let frontImagePath = user.frontImage;
+    let backImagePath = user.backImage;
 
-    // Handle new image upload
-    if (req.files && req.files["image"] && req.files["image"][0]) {
-      if (user.image) {
-        const oldImagePath = path.join(__dirname, '..', user.image);
-        fs.unlink(oldImagePath, (err) => {
-          if (err) {
-            console.error("Error deleting old image:", err);
-          } else {
-            console.log("Old image deleted:", oldImagePath);
-          }
-        });
+    // Handle new image uploads
+    if (req.files) {
+      // Handle profile image
+      if (req.files["image"] && req.files["image"][0]) {
+        if (user.image) {
+          const oldImagePath = path.join(__dirname, '..', user.image);
+          fs.unlink(oldImagePath, (err) => {
+            if (err) console.error("Error deleting old image:", err);
+          });
+        }
+        imagePath = `/uploads/${req.files["image"][0].filename}`;
       }
-      imagePath = `/uploads/${req.files["image"][0].filename}`;
+
+      // Handle business certificate image
+      if (req.files["pictureBusinessCertificate"] && req.files["pictureBusinessCertificate"][0]) {
+        if (user.pictureBusinessCertificate) {
+          const oldCertificatePath = path.join(__dirname, '..', user.pictureBusinessCertificate);
+          fs.unlink(oldCertificatePath, (err) => {
+            if (err) console.error("Error deleting old business certificate:", err);
+          });
+        }
+        pictureBusinessCertificatePath = `/uploads/${req.files["pictureBusinessCertificate"][0].filename}`;
+      }
+
+      // Handle front image
+      if (req.files["frontImage"] && req.files["frontImage"][0]) {
+        if (user.frontImage) {
+          const oldFrontImagePath = path.join(__dirname, '..', user.frontImage);
+          fs.unlink(oldFrontImagePath, (err) => {
+            if (err) console.error("Error deleting old front image:", err);
+          });
+        }
+        frontImagePath = `/uploads/${req.files["frontImage"][0].filename}`;
+      }
+
+      // Handle back image
+      if (req.files["backImage"] && req.files["backImage"][0]) {
+        if (user.backImage) {
+          const oldBackImagePath = path.join(__dirname, '..', user.backImage);
+          fs.unlink(oldBackImagePath, (err) => {
+            if (err) console.error("Error deleting old back image:", err);
+          });
+        }
+        backImagePath = `/uploads/${req.files["backImage"][0].filename}`;
+      }
     }
 
-    // Handle new pictureBusinessCertificate upload
-    if (req.files && req.files["pictureBusinessCertificate"] && req.files["pictureBusinessCertificate"][0]) {
-      if (user.pictureBusinessCertificate) {
-        const oldCertificatePath = path.join(__dirname, '..', user.pictureBusinessCertificate);
-        fs.unlink(oldCertificatePath, (err) => {
-          if (err) {
-            console.error("Error deleting old business certificate:", err);
-          } else {
-            console.log("Old business certificate deleted:", oldCertificatePath);
-          }
-        });
-      }
-      pictureBusinessCertificatePath = `/uploads/${req.files["pictureBusinessCertificate"][0].filename}`;
-    }
-
-    // If isGemstone is true, validate and update gemstone-related fields
+    // If isGemstone is true, validate gemstone-related fields
     if (isGemstone) {
       if (!id_cardNo) {
         return res.status(400).json({ error: 'ID card number is required for gemstone users' });
@@ -187,13 +221,19 @@ const updateUser = async (req, res) => {
       if (!pictureBusinessCertificatePath) {
         return res.status(400).json({ error: 'Business certificate image is required for gemstone users' });
       }
+      if (!frontImagePath) {
+        return res.status(400).json({ error: 'Front image is required for gemstone users' });
+      }
+      if (!backImagePath) {
+        return res.status(400).json({ error: 'Back image is required for gemstone users' });
+      }
     }
 
     // Update user fields
     user.username = username || user.username;
     user.email = email || user.email;
     
-    // Hash password if it's being updated
+    // Hash password if updated
     if (password) {
       const salt = await bcrypt.genSalt(10);
       user.password = await bcrypt.hash(password, salt);
@@ -204,18 +244,20 @@ const updateUser = async (req, res) => {
     user.status = status || user.status;
     user.phone = phone || user.phone;
     user.address = address || user.address;
-  
+
     user.image = imagePath;
     user.isGemstone = isGemstone !== undefined ? isGemstone : user.isGemstone;
     user.id_cardNo = isGemstone ? id_cardNo : null;
     user.taxNo = isGemstone ? taxNo : null;
     user.pictureBusinessCertificate = isGemstone ? pictureBusinessCertificatePath : null;
+    user.frontImage = isGemstone ? frontImagePath : null;
+    user.backImage = isGemstone ? backImagePath : null;
 
-    // Save the updated user
+    // Save updated user
     const updatedUser = await user.save();
     res.status(200).json(updatedUser);
 
-  } catch (error) {
+  }catch (error) {
     console.error("Error updating user:", error.message);
     res.status(500).json({ message: error.message });
   }

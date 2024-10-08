@@ -17,7 +17,7 @@ const getallSlider = async (req, res) => {
   };
   const addnewSlider = async (req, res) => {
     try {
-      const { status } = req.body;
+      const { status,url } = req.body;
       
       // Get image path if uploaded and prepend localhost URL
       const imagePath = req.files?.image ? `/uploads/${req.files.image[0].filename}` : null;
@@ -26,6 +26,7 @@ const getallSlider = async (req, res) => {
       const category = new Slider({
         image: imagePath,
         status,
+        url
       });
   
       // Save the new slider in the database
@@ -39,7 +40,7 @@ const getallSlider = async (req, res) => {
   const updateSlider = async (req, res) => {
     try {
       const { id } = req.params;
-      const { status } = req.body;
+      const { status,url } = req.body;
   
       const addSlider = await Slider.findById(id);
       if (!addSlider) {
@@ -68,6 +69,7 @@ const getallSlider = async (req, res) => {
   
       // Update other fields
       addSlider.status = status || addSlider.status;
+      addSlider.url = url || addSlider.url;
       addSlider.image = imagePath;
   
       // Save the updated slider
