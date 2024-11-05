@@ -54,7 +54,7 @@ const sendOtpForPasswordChange = async (req, res, next) => {
           from: process.env.EMAIL,
           to: email,
           subject: "Password Reset Request - Verify Your Email",
-          content: "Otp Code: " + random,
+          text: "Otp Code: " + random,
         };
   
         await transporter.sendMail(mailOptions);
