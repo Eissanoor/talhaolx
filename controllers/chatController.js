@@ -26,7 +26,10 @@ const sendMessage = async (req, res) => {
   const getChatHistory = async (req, res) => {
     try {
       const { userId, contactId } = req.query;
-  
+      await Message.updateMany(
+        { sender: userId, receiver: contactId, status: "delivered" },
+        { status: "read" }
+      );
       const messages = await Message.find({
         $or: [
           { sender: userId, receiver: contactId },
@@ -37,6 +40,8 @@ const sendMessage = async (req, res) => {
         .populate("sender", "username userId image")
         .populate("receiver", "username userId image");
   
+        // Mark unread messages as read
+     
       res.status(200).json(messages);
     } catch (error) {
       console.error("Error retrieving chat history:", error.message);
@@ -88,11 +93,11 @@ const sendMessage = async (req, res) => {
   };
   const markMessagesAsDelivered = async (req, res) => {
     try {
-      const { receiverId, senderId } = req.body;
+      const { receiverId } = req.body;
   
       // Update all messages sent by sender to receiver
       const result = await Message.updateMany(
-        { sender: senderId, receiver: receiverId, status: "sent" },
+        { receiver: receiverId, status: "sent" },
         { status: "delivered" }
       );
   
