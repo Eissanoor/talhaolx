@@ -26,7 +26,7 @@ const sendMessage = async (req, res) => {
   const getChatHistory = async (req, res) => {
     try {
       const { userId, contactId } = req.query;
-      await Message.updateMany(
+     const updatedmessages = await Message.updateMany(
         { sender: userId, receiver: contactId, status: "delivered" },
         { status: "read" }
       );
@@ -134,10 +134,57 @@ const sendMessage = async (req, res) => {
       res.status(500).json({ error: error.message });
     }
   };
+  const notification = async (req, res) => {
+    try {
+      const { userId, contactId } = req.query;
+  
+      // Fetch messages with status 'delivered' for the specified user
+      let messagesQuery;
+  
+      if (contactId) {
+        // If `contactId` is provided, fetch conversation history between the two users
+        messagesQuery = {
+          $or: [
+            { sender: userId, receiver: contactId },
+            { sender: contactId, receiver: userId }
+          ]
+        };
+      } else {
+        // If `contactId` is not provided, fetch all messages sent or received by the user with status 'delivered'
+        messagesQuery = {
+          $or: [
+            { sender: userId, status: "delivered" },
+            { receiver: userId, status: "delivered" }
+          ]
+        };
+      }
+  
+      // Update message statuses if a specific conversation is targeted
+      if (contactId) {
+        await Message.updateMany(
+          { sender: userId, receiver: contactId, status: "delivered" },
+          { status: "read" }
+        );
+      }
+  
+      // Fetch messages
+      const messages = await Message.find(messagesQuery)
+        .sort({ timestamp: 1 })
+        .populate("sender", "username userId image")
+        .populate("receiver", "username userId image");
+  
+      res.status(200).json(messages);
+    } catch (error) {
+      console.error("Error retrieving chat history:", error.message);
+      res.status(500).json({ error: error.message });
+    }
+  };
+  
 module.exports = {
     sendMessage,
     getChatHistory,
     listUserChats,
     markMessagesAsDelivered,
-    getAndMarkChatAsRead
+    getAndMarkChatAsRead,
+    notification
   };
