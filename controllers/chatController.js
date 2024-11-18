@@ -86,9 +86,53 @@ const sendMessage = async (req, res) => {
       res.status(500).json({ error: error.message });
     }
   };
+  const markMessagesAsDelivered = async (req, res) => {
+    try {
+      const { receiverId, senderId } = req.body;
   
+      // Update all messages sent by sender to receiver
+      const result = await Message.updateMany(
+        { sender: senderId, receiver: receiverId, status: "sent" },
+        { status: "delivered" }
+      );
+  
+      res.status(200).json({ message: "Messages updated.", result });
+    } catch (error) {
+      console.error("Error marking messages as delivered:", error.message);
+      res.status(500).json({ error: error.message });
+    }
+  };
+  const getAndMarkChatAsRead = async (req, res) => {
+    try {
+      const { senderId, receiverId } = req.body;
+  
+      // Fetch chat messages
+      const messages = await Message.find({
+        $or: [
+          { sender: senderId, receiver: receiverId },
+          { sender: receiverId, receiver: senderId }
+        ]
+      })
+        .sort({ timestamp: 1 })
+        .populate("sender", "username userId image")
+        .populate("receiver", "username userId image");
+  
+      // Mark unread messages as read
+      await Message.updateMany(
+        { sender: senderId, receiver: receiverId, status: "delivered" },
+        { status: "read" }
+      );
+  
+      res.status(200).json(messages);
+    } catch (error) {
+      console.error("Error retrieving or updating chat:", error.message);
+      res.status(500).json({ error: error.message });
+    }
+  };
 module.exports = {
     sendMessage,
     getChatHistory,
-    listUserChats
+    listUserChats,
+    markMessagesAsDelivered,
+    getAndMarkChatAsRead
   };
