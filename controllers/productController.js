@@ -678,6 +678,7 @@ const getActiveProductCountByCategory = async (req, res) => {
         countData => countData._id.toString() === category._id.toString()
       );
       return {
+        _id: category._id,
         category: category.name,
         productCount: productData ? productData.productCount : 0 // Default to 0 if no products are active
       };
