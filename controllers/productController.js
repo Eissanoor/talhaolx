@@ -654,7 +654,42 @@ const getProductsByUserId = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+const getActiveProductCountByCategory = async (req, res) => {
+  try {
+    // Aggregate to group products by category and count active products
+    const categoryProductCounts = await Product.aggregate([
+      {
+        $match: { status: "active" } // Match only active products
+      },
+      {
+        $group: {
+          _id: "$Category", // Group by category
+          productCount: { $sum: 1 } // Count the products in each group
+        }
+      }
+    ]);
 
+    // Fetch the first 10 categories with status = 1
+    const categories = await Category.find({ status: 1 }, { name: 1 });
+
+    // Combine the counts with the category details
+    const categorizedProductCounts = categories.map(category => {
+      const productData = categoryProductCounts.find(
+        countData => countData._id.toString() === category._id.toString()
+      );
+      return {
+        category: category.name,
+        productCount: productData ? productData.productCount : 0 // Default to 0 if no products are active
+      };
+    });
+
+    // Return the structured response
+    res.status(201).json(categorizedProductCounts);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json(error.message);
+  }
+};
 
 module.exports = {
   getallproduct,
@@ -669,5 +704,6 @@ module.exports = {
   getProductsByUserId,
   updateTrendingProducts,
   getTrendingProducts,
-  searchProduct
+  searchProduct,
+  getActiveProductCountByCategory
 };

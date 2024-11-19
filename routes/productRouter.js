@@ -6,6 +6,7 @@ const { upload } = require("../config/multerConfig.js");
 
 // const upload = multer({ storage: storage });
 router.get("/getcategoryproduct", categoryController.gettencategoriesbyproduct)
+router.get("/getActiveProductCountByCategory", categoryController.getActiveProductCountByCategory)
 router.get("/countProductsByStatus", categoryController.countProductsByStatus)
 router.get("/getallproductbyadmin", categoryController.getallproductbyadmin)
 router.get("/getProductsByCategory/:categoryId", categoryController.getProductsByCategory)
