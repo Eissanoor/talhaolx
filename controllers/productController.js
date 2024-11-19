@@ -420,7 +420,7 @@ const getProductById = async (req, res) => {
 const gettencategoriesbyproduct = async (req, res) => {
   try {
     // Find the first 10 categories with status = 1 and only return the name field
-    const categories = await Category.find({ status: 1 }, { name: 1 }).limit(10);
+    const categories = await Category.find({ status: 1 }, { name: 1 });
 
     // Extract the category IDs
     const categoryIds = categories.map(category => category._id);
