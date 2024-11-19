@@ -143,15 +143,14 @@ const sendMessage = async (req, res) => {
         // If `contactId` is provided, fetch conversation history between the two users
         messagesQuery = {
           $or: [
-            { sender: userId, receiver: contactId },
-            { sender: contactId, receiver: userId }
+           
+            { receiver: userId }
           ]
         };
       } else {
         // If `contactId` is not provided, fetch all messages sent or received by the user with status 'delivered'
         messagesQuery = {
           $or: [
-            { sender: userId, status: "delivered" },
             { receiver: userId, status: "delivered" }
           ]
         };
