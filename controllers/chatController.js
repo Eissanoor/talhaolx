@@ -107,7 +107,10 @@ const sendMessage = async (req, res) => {
   const getAndMarkChatAsRead = async (req, res) => {
     try {
       const { senderId, receiverId } = req.query;
-  
+      await Message.updateMany(
+        { sender: receiverId, receiver: senderId, status: "delivered" },
+        { status: "read" }
+      );
       // Fetch chat messages
       const messages = await Message.find({
         $or: [
@@ -121,10 +124,7 @@ const sendMessage = async (req, res) => {
 
   
       // Mark unread messages as read
-      await Message.updateMany(
-        { sender: senderId, receiver: receiverId, status: "delivered" },
-        { status: "read" }
-      );
+      
   
       res.status(200).json(messages);
     } catch (error) {
