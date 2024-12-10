@@ -427,7 +427,8 @@ const gettencategoriesbyproduct = async (req, res) => {
 
     // Find the products based on the category IDs
     const products = await Product.find(
-      { Category: { $in: categoryIds }, status: "active" });
+      { Category: { $in: categoryIds }, status: "active" }
+    ).sort({ createdAt: -1 });
 
     // Group products by their category and limit to 12 products per category
     const categorizedProducts = categories.map(category => {
