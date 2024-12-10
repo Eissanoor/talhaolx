@@ -195,6 +195,8 @@ const productSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Language",
   },
+},{
+  timestamps: true,
 });
 
 // Function to validate the image array lengthf
