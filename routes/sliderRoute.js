@@ -10,7 +10,7 @@ const { upload } = require("../config/multerConfig");
 // const upload = multer({ storage: storage });
 
 router.get('/', cache('5 minutes'), sliderController.getallSlider);
-router.get("/:id", sliderController.getSliderById)
+router.get("/:id",cache('5 minutes'), sliderController.getSliderById)
 router.post('/', upload.fields([{ name: 'image', maxCount: 1 }, { name: 'icon', maxCount: 1 }]), sliderController.addnewSlider);
 router.put('/:id', upload.fields([{ name: 'image', maxCount: 1 }, { name: 'icon', maxCount: 1 }]), sliderController.updateSlider);
 router.delete('/:id',sliderController.deleteSlider);
