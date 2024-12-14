@@ -3,9 +3,10 @@ const router = express.Router();
 const categoryController = require('../controllers/productController.js');
 const multer = require('multer');
 const { upload } = require("../config/multerConfig.js");
-
+const apicache = require('apicache');
+const cache = apicache.middleware;
 // const upload = multer({ storage: storage });
-router.get("/getcategoryproduct", categoryController.gettencategoriesbyproduct)
+router.get("/getcategoryproduct", cache('5 minutes'), categoryController.gettencategoriesbyproduct)
 router.get("/getActiveProductCountByCategory", categoryController.getActiveProductCountByCategory)
 router.get("/countProductsByStatus", categoryController.countProductsByStatus)
 router.get("/getallproductbyadmin", categoryController.getallproductbyadmin)
