@@ -3,6 +3,8 @@ const app = express();
 const http = require('http'); // Import the HTTP module
 const server = http.createServer(app); // Create an HTTP server
 const { Server } = require('socket.io'); // Import socket.io
+const expressWinston = require('express-winston');
+const logger = require('./middleware/logger.js');
 const cors = require('cors');
 const path = require('path');
 const helmet = require('helmet');
@@ -24,7 +26,7 @@ const reactNativeRoute = require('./routes/reactNativeRoute');
 const aboutRoute = require('./routes/about&contactRoute');
 const CommentRoute = require('./routes/commentRoute');
 const Otp = require('./routes/otpRoute');
-
+const  getLogs  = require('./controllers/logsController');
 dotenv.config({ path: "./config.env" });
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
@@ -35,6 +37,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors()); // Enable CORS
 // app.use(helmet()); // Set security-related HTTP headers
+
+app.use(expressWinston.logger({
+  winstonInstance: logger,
+  meta: true, // Log metadata like HTTP method, URL, response time
+  msg: "HTTP {{req.method}} {{req.url}} {{res.statusCode}} {{res.responseTime}}ms", // Custom log message
+  expressFormat: true, // Default Express/morgan-like format
+}));
+
 // app.use(morgan('dev')); // HTTP request logger
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(session({
@@ -64,7 +74,7 @@ app.use("/otp", Otp);
 app.get('/', async (req, res) => {
   res.status(200).json({ status: 200, message: "HOME PAGE", data: null });
 });
-
+app.get('/logs', getLogs.getLogs);
 app.use((req, res, next) => {
   res.status(404).json({ status: 404, message: 'Route not found' });
 });
@@ -74,6 +84,9 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: err.stack });
 });
+app.use(expressWinston.errorLogger({
+  winstonInstance: logger,
+}));
 
 // Initialize socket.io with the HTTP server
 const io = new Server(server, {
