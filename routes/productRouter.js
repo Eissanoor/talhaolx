@@ -9,7 +9,7 @@ const cache = apicache.middleware;
 router.get("/getcategoryproduct", cache('5 minutes'), categoryController.gettencategoriesbyproduct)
 router.get("/getActiveProductCountByCategory", cache('5 minutes'),categoryController.getActiveProductCountByCategory)
 router.get("/countProductsByStatus", cache('5 minutes'),categoryController.countProductsByStatus)
-router.get("/getallproductbyadmin",cache('5 minutes'), categoryController.getallproductbyadmin)
+router.get("/getallproductbyadmin", categoryController.getallproductbyadmin)
 router.get("/getProductsByCategory/:categoryId",cache('5 minutes'), categoryController.getProductsByCategory)
 router.get("/getProductsByUserId/:userId",cache('5 minutes'), categoryController.getProductsByUserId)
 router.get("/getTrendingProducts",cache('5 minutes'), categoryController.getTrendingProducts)
