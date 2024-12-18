@@ -10,7 +10,7 @@ dotenv.config({ path: "./config.env" });
 const { cloudinary } = require("../config/cloudanary.js");
 const C_cloud_name = process.env.C_cloud_name
 require('../auth/auth.js');
-const frontendbaseURL = "http://localhost:592"
+const frontendbaseURL = "https://pakardi.com"
 const addUser = async (req, res) => {
   const { 
     username, 
@@ -362,9 +362,9 @@ const googleCallback = (req, res, next) => {
 
       // Redirect based on the status value
       if (status === 0) {
-        return res.redirect('http://localhost:592/SinUpForm');
+        return res.redirect('http://pakardi.com/SinUpForm');
       } else if (status === 1) {
-        return res.redirect('http://localhost:592/LoginForm');
+        return res.redirect('https://pakardi.com/LoginForm');
       }
 
       const redirectUrl = req.query.state === 'login' ? '/signup' : '/login';
