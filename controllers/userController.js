@@ -362,9 +362,9 @@ const googleCallback = (req, res, next) => {
 
       // Redirect based on the status value
       if (status === 0) {
-        return res.redirect('https://pakardi.com/SinUpForm');
+        return res.redirect('http://localhost:592/SinUpForm');
       } else if (status === 1) {
-        return res.redirect('https://pakardi.com/LoginForm');
+        return res.redirect('http://localhost:592/LoginForm');
       }
 
       const redirectUrl = req.query.state === 'login' ? '/signup' : '/login';
