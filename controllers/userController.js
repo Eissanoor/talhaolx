@@ -10,7 +10,7 @@ dotenv.config({ path: "./config.env" });
 const { cloudinary } = require("../config/cloudanary.js");
 const C_cloud_name = process.env.C_cloud_name
 require('../auth/auth.js');
-const frontendbaseURL = "https://pakardi.com"
+const frontendbaseURL = "http://localhost:592"
 const addUser = async (req, res) => {
   const { 
     username, 
