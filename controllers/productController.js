@@ -341,7 +341,7 @@ const deleteProduct = async (req, res) => {
 
     // Delete the product from the database
     await Product.findByIdAndDelete(productId);
-
+    apicache.clear("/product/getcategoryproduct");
     res.status(200).json({ message: "Product and associated images deleted successfully." });
   } catch (error) {
     res.status(500).json({ error: error.message });
