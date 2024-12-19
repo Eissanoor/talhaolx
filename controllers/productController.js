@@ -308,7 +308,7 @@ const updateProduct = async (req, res) => {
     // Save the updated product to the database
     const updatedProduct = await product.save();
 
-
+//
     res.status(200).json(updatedProduct);
   } catch (error) {
     res.status(500).json({ error: error.message });
