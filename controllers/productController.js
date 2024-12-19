@@ -304,10 +304,10 @@ const updateProduct = async (req, res) => {
       product.images = images;
     }
 
-    apicache.clear("/getcategoryproduct");
     // Save the updated product to the database
     const updatedProduct = await product.save();
-
+    
+    apicache.clear("/getcategoryproduct");
 //
     res.status(200).json(updatedProduct);
   } catch (error) {
