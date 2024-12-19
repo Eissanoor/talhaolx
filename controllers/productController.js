@@ -307,7 +307,8 @@ const updateProduct = async (req, res) => {
     // Save the updated product to the database
     const updatedProduct = await product.save();
     
-    apicache.clear("/getcategoryproduct");
+    // Clear cache for the full URL
+    apicache.clear("/product/getcategoryproduct");
 //
     res.status(200).json(updatedProduct);
   } catch (error) {
