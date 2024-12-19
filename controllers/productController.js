@@ -2,6 +2,9 @@ const Product = require("../models/productModel.js");
 const Category = require("../models/catagoryModel");
 const SearchQuery = require('../models/searchQueryModel.js');
 const TrendingProduct = require('../models/trendingProductModel.js');
+const apicache = require('apicache');
+
+
 const fs = require('fs'); // Import the fs module for file system operations
 const path = require('path');
 var dotenv = require("dotenv");
@@ -301,8 +304,10 @@ const updateProduct = async (req, res) => {
       product.images = images;
     }
 
+    apicache.clear("/getcategoryproduct");
     // Save the updated product to the database
     const updatedProduct = await product.save();
+
 
     res.status(200).json(updatedProduct);
   } catch (error) {
