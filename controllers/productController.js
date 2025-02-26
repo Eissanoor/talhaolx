@@ -214,12 +214,9 @@ const addnewproduct = async (req, res) => {
 
     // Validate required fields
     if (!name || !price || !location || !Category || !SubCategory || !User) {
-      return res
-        .status(400)
-        .json({
-          error:
-            "Name, price, location, category, SubCategory, and User are required.",
-        });
+      return res.status(400).json({
+        error: "Name, price, location, category, SubCategory, and User are required."
+      });
     }
 
     // Validate at least one image
@@ -243,10 +240,14 @@ const addnewproduct = async (req, res) => {
       ...optionalFields,
     });
 
-    // Save the product to the database
-    const savedProduct = await newProduct.save();
+    // Save the product to the database without waiting for response
+    newProduct.save().catch(err => {
+      console.error('Error saving product:', err);
+    });
 
-    res.status(201).json(savedProduct);
+    // Send immediate success response
+    res.status(201).json({ message: "Product creation initiated successfully" });
+    
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

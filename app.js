@@ -79,6 +79,7 @@ app.use((req, res, next) => {
   res.status(404).json({ status: 404, message: 'Route not found' });
 });
 
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -95,6 +96,8 @@ const io = new Server(server, {
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
   }
 });
+
+ 
 
 // Set up event listeners for socket.io
 io.on('connection', (socket) => {
