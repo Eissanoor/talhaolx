@@ -454,6 +454,61 @@ const gettencategoriesbyproduct = async (req, res) => {
     res.status(500).json(error.message);
   }
 };
+const homeproduct = async (req, res) => {
+  try {
+    // Get page and limit from query parameters with defaults
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 8;
+    const skip = (page - 1) * limit;
+
+    // Get total count of categories with status 1
+    const totalCategories = await Category.countDocuments({ status: 1 });
+
+    // Find categories with pagination
+    const categories = await Category.find({ status: 1 }, { name: 1 })
+      .skip(skip)
+      .limit(limit);
+
+    // Extract the category IDs
+    const categoryIds = categories.map(category => category._id);
+
+    // Find the products based on the category IDs
+    const products = await Product.find(
+      { Category: { $in: categoryIds }, status: "active" }
+    ).sort({ createdAt: -1 });
+
+    // Group products by their category and limit to 12 products per category
+    const categorizedProducts = categories.map(category => {
+      return {
+        category: category,
+        products: products
+          .filter(product => product.Category.toString() === category._id.toString())
+          .slice(0, 12) // Limit to 12 products
+      };
+    });
+
+    // Calculate pagination metadata
+    const totalPages = Math.ceil(totalCategories / limit);
+    const hasNextPage = page < totalPages;
+    const hasPrevPage = page > 1;
+
+    // Return the structured response with pagination info
+    res.status(200).json({
+      data: categorizedProducts,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalCategories,
+        limit,
+        hasNextPage,
+        hasPrevPage
+      }
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json(error.message);
+  }
+};
 const getProductsByCategory = async (req, res) => {
   try {
     const { categoryId } = req.params; // Assume the category ID is passed as a route parameter
@@ -520,6 +575,103 @@ const getProductsByCategory = async (req, res) => {
     });
 
     res.status(200).json(validProducts);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json(error.message);
+  }
+};
+const getProductsByCategoryId = async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+    // Get page and limit from query parameters with defaults
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    // Get total count of products in this category
+    const totalProducts = await Product.countDocuments({ Category: categoryId });
+
+    // Find products by category with pagination and populate related fields
+    const products = await Product.find({ Category: categoryId })
+      .skip(skip)
+      .limit(limit)
+      .populate("Category", "name")
+      .populate("SubCategory", "name")
+      .populate("FooterCategory", "name")
+      .populate({
+        path: "User",
+        select: "username email phone userId",
+      })
+      .populate("Brand", "name")
+      .populate("Condition", "name")
+      .populate("DeviceType", "name")
+      .populate("Type", "name")
+      .populate("Make", "name")
+      .populate("Furnished", "name")
+      .populate("Bedroom", "name")
+      .populate("Bathroom", "name")
+      .populate("Storey", "name")
+      .populate("Construction", "name")
+      .populate("Feature", "name")
+      .populate("Areaunit", "name")
+      .populate("FloorLevel", "name")
+      .populate("ConstructionState", "name")
+      .populate("OperatingSystem", "name")
+      .populate("HardDriveType", "name")
+      .populate("FunctionType", "name")
+      .populate("SensorSize", "name")
+      .populate("Wifi", "name")
+      .populate("MinFocalLengthRange", "name")
+      .populate("MaxFocalLengthRange", "name")
+      .populate("MaxAperatureRange", "name")
+      .populate("ScreenSize", "name")
+      .populate("Resolution", "name")
+      .populate("EngineType", "name")
+      .populate("EngineCapacity", "name")
+      .populate("RegistrationCity", "name")
+      .populate("HiringPerson", "name")
+      .populate("CareerLevel", "name")
+      .populate("PositionType", "name")
+      .populate("TypeofAd", "name")
+      .populate("Breed", "name")
+      .populate("Sex", "name")
+      .populate("Materialtype", "name")
+      .populate("Handmade", "name")
+      .populate("Origin", "name")
+      .populate("Language", "name");
+
+    // Filter out products with any null references
+    const validProducts = products.filter((product) => {
+      const productObj = product.toObject();
+      return Object.keys(productObj).every((key) => {
+        if (Array.isArray(productObj[key])) {
+          return (
+            productObj[key].length > 0 &&
+            productObj[key].every((item) => item !== null)
+          );
+        }
+        return productObj[key] !== null;
+      });
+    });
+
+    // Calculate pagination metadata
+    const totalPages = Math.ceil(totalProducts / limit);
+    const hasNextPage = page < totalPages;
+    const hasPrevPage = page > 1;
+
+    // Return the structured response with pagination info
+    res.status(200).json({
+      data: validProducts,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalProducts,
+        limit,
+        hasNextPage,
+        hasPrevPage
+      }
+    });
+
   } catch (error) {
     console.log(error.message);
     res.status(500).json(error.message);
@@ -715,5 +867,7 @@ module.exports = {
   updateTrendingProducts,
   getTrendingProducts,
   searchProduct,
-  getActiveProductCountByCategory
+  getActiveProductCountByCategory,
+  homeproduct,
+  getProductsByCategoryId
 };
