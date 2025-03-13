@@ -456,45 +456,72 @@ const gettencategoriesbyproduct = async (req, res) => {
 };
 const homeproduct = async (req, res) => {
   try {
-    // Get page and limit from query parameters with defaults
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 8;
     const skip = (page - 1) * limit;
 
-    // Get total count of categories with status 1
-    const totalCategories = await Category.countDocuments({ status: 1 });
-
-    // Find categories with pagination
-    const categories = await Category.find({ status: 1 }, { name: 1 })
-      .skip(skip)
-      .limit(limit);
-
-    // Extract the category IDs
-    const categoryIds = categories.map(category => category._id);
-
-    // Find the products based on the category IDs
-    const products = await Product.find(
-      { Category: { $in: categoryIds }, status: "active" }
-    ).sort({ createdAt: -1 });
-
-    // Group products by their category and limit to 12 products per category
-    const categorizedProducts = categories.map(category => {
-      return {
-        category: category,
-        products: products
-          .filter(product => product.Category.toString() === category._id.toString())
-          .slice(0, 12) // Limit to 12 products
-      };
-    });
+    // Use Promise.all to run queries concurrently
+    const [totalCategories, aggregatedResults] = await Promise.all([
+      Category.countDocuments({ status: 1 }),
+      Category.aggregate([
+        // Match active categories
+        { $match: { status: 1 } },
+        // Apply pagination
+        { $skip: skip },
+        { $limit: limit },
+        // Lookup products for each category
+        {
+          $lookup: {
+            from: 'products',
+            let: { categoryId: '$_id' },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      { $eq: ['$Category', '$$categoryId'] },
+                      { $eq: ['$status', 'active'] }
+                    ]
+                  }
+                }
+              },
+              { $sort: { createdAt: -1 } },
+              { $limit: 12 },
+              // Add any necessary product fields here
+              {
+                $project: {
+                  name: 1,
+                  price: 1,
+                  description: 1,
+                  images: 1,
+                  // Add other required fields
+                }
+              }
+            ],
+            as: 'products'
+          }
+        },
+        // Project final shape of data
+        {
+          $project: {
+            category: {
+              _id: '$_id',
+              name: '$name'
+            },
+            products: 1
+          }
+        }
+      ])
+    ]);
 
     // Calculate pagination metadata
     const totalPages = Math.ceil(totalCategories / limit);
     const hasNextPage = page < totalPages;
     const hasPrevPage = page > 1;
 
-    // Return the structured response with pagination info
+    // Return optimized response
     res.status(200).json({
-      data: categorizedProducts,
+      data: aggregatedResults,
       pagination: {
         currentPage: page,
         totalPages,
@@ -505,8 +532,8 @@ const homeproduct = async (req, res) => {
       }
     });
   } catch (error) {
-    console.log(error.message);
-    res.status(500).json(error.message);
+    console.error('Error in homeproduct:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 };
 const getProductsByCategory = async (req, res) => {
@@ -583,98 +610,58 @@ const getProductsByCategory = async (req, res) => {
 const getProductsByCategoryId = async (req, res) => {
   try {
     const { categoryId } = req.params;
-    // Get page and limit from query parameters with defaults
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    // Get total count of products in this category
-    const totalProducts = await Product.countDocuments({ Category: categoryId });
-
-    // Find products by category with pagination and populate related fields
-    const products = await Product.find({ Category: categoryId })
-      .skip(skip)
-      .limit(limit)
-      .populate("Category", "name")
-      .populate("SubCategory", "name")
-      .populate("FooterCategory", "name")
-      .populate({
-        path: "User",
-        select: "username email phone userId",
-      })
-      .populate("Brand", "name")
-      .populate("Condition", "name")
-      .populate("DeviceType", "name")
-      .populate("Type", "name")
-      .populate("Make", "name")
-      .populate("Furnished", "name")
-      .populate("Bedroom", "name")
-      .populate("Bathroom", "name")
-      .populate("Storey", "name")
-      .populate("Construction", "name")
-      .populate("Feature", "name")
-      .populate("Areaunit", "name")
-      .populate("FloorLevel", "name")
-      .populate("ConstructionState", "name")
-      .populate("OperatingSystem", "name")
-      .populate("HardDriveType", "name")
-      .populate("FunctionType", "name")
-      .populate("SensorSize", "name")
-      .populate("Wifi", "name")
-      .populate("MinFocalLengthRange", "name")
-      .populate("MaxFocalLengthRange", "name")
-      .populate("MaxAperatureRange", "name")
-      .populate("ScreenSize", "name")
-      .populate("Resolution", "name")
-      .populate("EngineType", "name")
-      .populate("EngineCapacity", "name")
-      .populate("RegistrationCity", "name")
-      .populate("HiringPerson", "name")
-      .populate("CareerLevel", "name")
-      .populate("PositionType", "name")
-      .populate("TypeofAd", "name")
-      .populate("Breed", "name")
-      .populate("Sex", "name")
-      .populate("Materialtype", "name")
-      .populate("Handmade", "name")
-      .populate("Origin", "name")
-      .populate("Language", "name");
-
-    // Filter out products with any null references
-    const validProducts = products.filter((product) => {
-      const productObj = product.toObject();
-      return Object.keys(productObj).every((key) => {
-        if (Array.isArray(productObj[key])) {
-          return (
-            productObj[key].length > 0 &&
-            productObj[key].every((item) => item !== null)
-          );
-        }
-        return productObj[key] !== null;
-      });
-    });
+    // Run count query and product query concurrently
+    const [totalProducts, products] = await Promise.all([
+      Product.countDocuments({ Category: categoryId }),
+      Product.find({ Category: categoryId })
+        .select({ // Only select needed fields
+          name: 1,
+          price: 1,
+          description: 1,
+          images: 1,
+          status: 1,
+          Category: 1,
+          SubCategory: 1,
+          User: 1,
+          // Add other essential fields you need
+        })
+        .skip(skip)
+        .limit(limit)
+        .populate([
+          { path: "Category", select: "name" },
+          { path: "SubCategory", select: "name" },
+          { 
+            path: "User",
+            select: "username email phone userId"
+          }
+          // Add other essential populates only
+        ])
+        .lean() // Convert to plain JavaScript objects
+    ]);
 
     // Calculate pagination metadata
     const totalPages = Math.ceil(totalProducts / limit);
-    const hasNextPage = page < totalPages;
-    const hasPrevPage = page > 1;
 
-    // Return the structured response with pagination info
+    // Return optimized response
     res.status(200).json({
-      data: validProducts,
+      data: products,
       pagination: {
         currentPage: page,
         totalPages,
         totalProducts,
         limit,
-        hasNextPage,
-        hasPrevPage
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1
       }
     });
 
   } catch (error) {
-    console.log(error.message);
-    res.status(500).json(error.message);
+    console.error('Error in getProductsByCategoryId:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 };
 const countProductsByStatus = async (req, res) => {
