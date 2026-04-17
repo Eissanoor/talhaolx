@@ -439,7 +439,7 @@ const gettencategoriesbyproduct = async (req, res) => {
       .sort({ createdAt: -1 })
       .populate({
         path: "User",
-        select: "username email phone userId",
+        select: "username email phone userId image",
       });
 
     // Group products by their category and limit to 12 products per category
