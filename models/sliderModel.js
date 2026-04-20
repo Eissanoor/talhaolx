@@ -5,6 +5,15 @@ const sliderSchema = new Schema({
   image: {
     type: String,
   },
+  title: {
+    type: String,
+  },
+  heading: {
+    type: String,
+  },
+  description: {
+    type: String,
+  },
   url: {
     type: String,
   },

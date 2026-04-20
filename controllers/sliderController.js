@@ -17,7 +17,7 @@ const getallSlider = async (req, res) => {
   };
   const addnewSlider = async (req, res) => {
     try {
-      const { status,url } = req.body;
+      const { status, url, title, heading, description } = req.body;
       
       // Get image path if uploaded and prepend localhost URL
       const imagePath = req.files?.image ? `/uploads/${req.files.image[0].filename}` : null;
@@ -26,7 +26,10 @@ const getallSlider = async (req, res) => {
       const category = new Slider({
         image: imagePath,
         status,
-        url
+        url,
+        title,
+        heading,
+        description,
       });
   
       // Save the new slider in the database
@@ -40,7 +43,7 @@ const getallSlider = async (req, res) => {
   const updateSlider = async (req, res) => {
     try {
       const { id } = req.params;
-      const { status,url } = req.body;
+      const { status, url, title, heading, description } = req.body;
   
       const addSlider = await Slider.findById(id);
       if (!addSlider) {
@@ -68,8 +71,11 @@ const getallSlider = async (req, res) => {
       }
   
       // Update other fields
-      addSlider.status = status || addSlider.status;
-      addSlider.url = url || addSlider.url;
+      if (status !== undefined) addSlider.status = status;
+      if (url !== undefined) addSlider.url = url;
+      if (title !== undefined) addSlider.title = title;
+      if (heading !== undefined) addSlider.heading = heading;
+      if (description !== undefined) addSlider.description = description;
       addSlider.image = imagePath;
   
       // Save the updated slider
