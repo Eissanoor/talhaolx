@@ -199,6 +199,17 @@ const productSchema = new mongoose.Schema({
   timestamps: true,
 });
 
+// Backward compatibility for clients that still read a single `image` field.
+productSchema.virtual("image").get(function () {
+  if (Array.isArray(this.images) && this.images.length > 0) {
+    return this.images[0];
+  }
+  return null;
+});
+
+productSchema.set("toJSON", { virtuals: true });
+productSchema.set("toObject", { virtuals: true });
+
 // Function to validate the image array lengthf
 function arrayLimit(val) {
   return val.length <= 8;

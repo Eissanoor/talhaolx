@@ -55,7 +55,7 @@ const getTrendingProducts = async (req, res) => {
     const trendingProducts = await TrendingProduct.find()
       .sort({ trendScore: -1, updatedAt: -1 })
       .limit(limit)
-      .populate('productId', 'name image');
+      .populate('productId', 'name images');
 
     res.status(200).json(trendingProducts);
   } catch (error) {
@@ -120,7 +120,7 @@ const searchProduct = async (req, res) => {
       const trendingProducts = await TrendingProduct.find()
         .sort({ trendScore: -1, updatedAt: -1 })
         .limit(limit)
-        .populate('productId', 'name image'); // Populate product details like name and image
+        .populate('productId', 'name images'); // Populate product details like name and images
 
       return res.status(200).json(trendingProducts);
     }
